@@ -39,9 +39,9 @@ jobs:
           from pathlib import Path
           from jsonschema import Draft202012Validator
           schema = json.loads(Path("schemas/request.schema.json").read_text(encoding="utf-8"))
-          example = json.loads(Path("examples/request.example.json").read_text(encoding="utf-8"))
           Draft202012Validator.check_schema(schema)
-          Draft202012Validator(schema).validate(example)
+          for path in Path("examples").glob("request*.json"):
+              Draft202012Validator(schema).validate(json.loads(path.read_text(encoding="utf-8")))
           PY
       - name: Run offline regression checks
         run: python -m unittest discover -s tests -v

@@ -1,4 +1,4 @@
-"""Explicit CRS, scopes and provenance checks for the first four adapters."""
+"""Explicit CRS, scopes and provenance checks for line and polygon datasets."""
 from dataclasses import dataclass
 import hashlib
 import json

@@ -35,7 +35,7 @@ def repaint(run,patch,output_root=None,instances=None,title=None):
             shutil.copy2(source,destination)
     for item in renderable:
         item_dir=target/item["instance_id"];item_dir.mkdir()
-        for key in ("analysis_file","statistics_file"):
+        for key in ("analysis_file","statistics_file","details_file"):
             if item.get(key):
                 source=inside(run,item[key]["path"]);shutil.copy2(source,target/item[key]["path"])
         changed=instances is None or item["instance_id"] in instances or title is not None

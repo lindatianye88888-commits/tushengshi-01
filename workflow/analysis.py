@@ -8,6 +8,11 @@ ALGORITHM_VERSION = "base-maps-0.2.0"
 PATH_CLASSES = {"footway", "path", "pedestrian", "steps", "cycleway", "bridleway"}
 
 
+def algorithm_version(did):
+    from .statistics import STATISTICAL_DIAGRAMS, STATISTICS_VERSION
+    return STATISTICS_VERSION if did in STATISTICAL_DIAGRAMS else ALGORITHM_VERSION
+
+
 def classify(properties, parameters, did):
     if did == "fabric":
         return "建筑轮廓"
@@ -22,6 +27,9 @@ def classify(properties, parameters, did):
 
 
 def analyze(did, parameters, dataset, ctx):
+    from .statistics import STATISTICAL_DIAGRAMS, analyze_statistics
+    if did in STATISTICAL_DIAGRAMS:
+        return analyze_statistics(did, parameters, dataset, ctx)
     groups, display_features = defaultdict(list), []
     used, excluded = [], {str(v) for v in parameters.get("exclude_ids", [])}
     all_ids = {f["id"] for f in dataset["features"]}

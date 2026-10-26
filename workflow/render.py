@@ -12,7 +12,7 @@ from pyproj import Transformer
 from .catalog import DIAGRAMS
 from .styles import PALETTES, ROAD_WIDTHS, TITLES, diagram_colors, effective_style, validate_style
 
-RENDER_VERSION = "site-atlas-0.2.0"
+RENDER_VERSION = "site-atlas-0.3.0"
 
 
 def font_setup():
@@ -125,6 +125,38 @@ def credits(result):
     return source.get("attributions", [source.get("source", "")])
 
 
+def draw_result(ax, result, project, parameters, colors, compact=False):
+    if result.get("display_kind"):
+        from .statistics_render import draw_panel
+        draw_panel(ax, result, project, parameters, colors, compact)
+    else:
+        draw_map(ax, result, project, parameters, colors, compact)
+
+
+def draw_standard_summary(side, result, item, colors):
+    ink, accent = "#26352e", "#34584b"
+    side.set_axis_off()
+    side.text(0, 1, "统计与图例", size=13, weight="bold", color=ink, va="top")
+    is_roads = item["diagram_id"] == "roads"
+    metric = f"{result['total_length_m']/1000:,.1f} km" if is_roads else f"{result['coverage_percent']:.2f}%"
+    side.text(0, .89, metric, size=24, color=accent)
+    side.text(0, .835, "已收录道路线总长度" if is_roads else "已收录轮廓面积 / 分析范围面积", size=9, color="#667168")
+    side.text(0, .785, f"统计范围 {result['analysis_area_m2']:,.0f} m²\n参与统计对象 {result['analysis_feature_count']} 个", size=8.5, linespacing=1.7, color=ink)
+    rows = list(result["table"])
+    if item["diagram_id"] == "landuse":
+        rows.append({"category":"未收录 / 未分类", "value":result.get("unmapped_area_m2", 0), "unit":"m²"})
+        colors["未收录 / 未分类"] = "#eeeee6"
+    step = min(.057, .57/max(len(rows), 1))
+    for n,row in enumerate(rows):
+        y = .665-n*step
+        side.plot([0, .05], [y, y], color=colors[row["category"]], lw=4)
+        label = row["category"] if len(row["category"]) <= 16 else row["category"][:15]+"…"
+        side.text(.085, y, label, size=8, va="center", color=ink)
+        number = f"{row['value']/1000:,.2f} km" if is_roads else f"{row['value']/1e6:,.3f} km²"
+        side.text(1, y-.022, number, size=7.3, va="center", ha="right", color="#667168")
+    side.set_xlim(0, 1);side.set_ylim(0, 1)
+
+
 def export(result, task, item, output_dir):
     style = validate_style(effective_style(task, item))
     colors = diagram_colors(result, style)
@@ -140,32 +172,18 @@ def export(result, task, item, output_dir):
             if task.get("is_example"):
                 fig.text(.955, .944, "合成数据 · 流程验证", ha="right", size=11, color="#a15d3c")
             ax = fig.add_axes([.045, .19, .66, .62])
-            draw_map(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, colors)
+            draw_result(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, colors)
             side = fig.add_axes([.745, .19, .21, .62])
-            side.set_axis_off()
-            side.text(0, 1, "统计与图例", size=13, weight="bold", color=ink, va="top")
-            is_roads = item["diagram_id"] == "roads"
-            metric = f"{result['total_length_m']/1000:,.1f} km" if is_roads else f"{result['coverage_percent']:.2f}%"
-            side.text(0, .89, metric, size=24, color=accent)
-            side.text(0, .835, "已收录道路线总长度" if is_roads else "已收录轮廓面积 / 分析范围面积", size=9, color="#667168")
-            side.text(0, .785, f"统计范围 {result['analysis_area_m2']:,.0f} m²\n参与统计对象 {result['analysis_feature_count']} 个", size=8.5, linespacing=1.7, color=ink)
-            rows = list(result["table"])
-            if item["diagram_id"] == "landuse":
-                rows.append({"category":"未收录 / 未分类", "value":result.get("unmapped_area_m2", 0), "unit":"m²"})
-                colors["未收录 / 未分类"] = "#eeeee6"
-            step = min(.057, .57/max(len(rows), 1))
-            for n,row in enumerate(rows):
-                y = .665-n*step
-                side.plot([0, .05], [y, y], color=colors[row["category"]], lw=4)
-                label = row["category"] if len(row["category"]) <= 16 else row["category"][:15]+"…"
-                side.text(.085, y, label, size=8, va="center", color=ink)
-                number = f"{row['value']/1000:,.2f} km" if is_roads else f"{row['value']/1e6:,.3f} km²"
-                side.text(1, y-.022, number, size=7.3, va="center", ha="right", color="#667168")
-            side.set_xlim(0, 1)
-            side.set_ylim(0, 1)
+            if result.get("display_kind"):
+                from .statistics_render import draw_summary
+                draw_summary(side, result, colors)
+            else:
+                draw_standard_summary(side, result, item, colors)
             source = result["source"]
             boundary = "资料完整性按来源声明，指标仅对应已提供资料。" if source.get("mapping_completeness") == "verified_complete" else "现实完整性未核实；地图空白不等于现实空地。"
             notes = [f"坐标 {result['analysis_crs']} | 实线：显示范围；虚线（不同时）：统计范围 | 真北 N", f"来源：{source['source']} | 时段：{source['data_period']} | 获取：{source['acquired_at']}", f"方法：{result['method']}", f"数据 {result['data_sha256'][:12]} | 算法 {result['algorithm_version']} | {boundary}"]
+            if result.get("display_kind") in {"orientation_rose", "typology_catalog"}:
+                notes[0] = f"原始分析坐标 {result['analysis_crs']} | "+("方位以场地中心真北为0°；扇区数据见CSV。" if result["display_kind"]=="orientation_rose" else "所有轮廓卡片保持同一米制比例；完整来源ID与原坐标保留在明细及分析记录。")
             for n,note in enumerate(notes):
                 fig.text(.045, .139-n*.023, wrapped(note, 160), size=7, color="#667168", va="top")
             attribution = "; ".join(credits(result))
@@ -199,9 +217,13 @@ def contact_board(task, items, results, path):
                 bottom = .09+(rows-row-1)*cell_height
                 ax = fig.add_axes([left, bottom+.075, .93/columns, cell_height-.09])
                 result = results[item["instance_id"]]
-                draw_map(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, diagram_colors(result, effective_style(task, item)), compact=True)
+                draw_result(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, diagram_colors(result, effective_style(task, item)), compact=True)
                 fig.text(left+.465/columns, bottom+.03, TITLES.get(item["diagram_id"], item["name"]), ha="center", size=13, color="#34584b", weight="bold")
-                note = f"道路线 {result['total_length_m']/1000:.1f} km" if item["diagram_id"] == "roads" else f"已收录面积占比 {result['coverage_percent']:.1f}%"
+                if result.get("display_kind"):
+                    from .statistics_render import summary_text
+                    note = summary_text(result)
+                else:
+                    note = f"道路线 {result['total_length_m']/1000:.1f} km" if item["diagram_id"] == "roads" else f"已收录面积占比 {result['coverage_percent']:.1f}%"
                 fig.text(left+.465/columns, bottom+.005, note, ha="center", size=9, color="#667168")
             all_credits = list(dict.fromkeys(c for result in results.values() for c in credits(result)))
             fig.text(.035, .055, wrapped("来源署名："+"; ".join(all_credits), 200), size=7, color="#667168", va="top")

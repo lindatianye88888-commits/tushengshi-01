@@ -41,7 +41,7 @@ def inspect_run(run):
         if (set(f["format"] for f in item.get("files",[]))!=set(item["output_formats"]) or
                 len(item.get("files",[]))!=len(set(item["output_formats"]))):
             problems.append(f"{item['instance_id']} 的实际导出格式与任务清单不一致。")
-        records=[item.get("analysis_file"),item.get("statistics_file"),*item.get("files",[])]
+        records=[item.get("analysis_file"),item.get("statistics_file"),item.get("details_file"),*item.get("files",[])]
         for record in filter(None,records):
             try:
                 path=inside(run,record["path"])
@@ -54,7 +54,7 @@ def inspect_run(run):
             if result["analysis_area_m2"]<=0: problems.append("统计范围面积无效。")
             if result.get("coverage_percent") is not None and not 0 <= result["coverage_percent"] <= 100.000001:
                 problems.append("面积覆盖超过100%或低于0%。")
-            total=result["total_length_m"] if item["diagram_id"]=="roads" else result["total_area_m2"]
+            total=result["total_length_m"] if result.get("total_length_m") is not None else result["total_area_m2"]
             if not math.isclose(sum(row["value"] for row in result["table"]),total,rel_tol=1e-8,abs_tol=1e-6):
                 problems.append("统计表合计与图上总指标不一致。")
             for rid in item["required_data"]:

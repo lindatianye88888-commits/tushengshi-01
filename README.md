@@ -1,6 +1,6 @@
 # 图省事 01｜建筑景观规划·分析图工作流
 
-当前为 v0.2 通用执行器。主入口是 [跨端操作说明](WORKFLOW.md)，通过请求文件、任务卡、资料获取、计算、预览、验收和成果包完成一次出图。当前 Codex 环境已实测；WorkBuddy、豆包等客户端通过同一文件与命令协议使用，是否可直接调用取决于其本地工具权限。
+当前为 v0.3：**7类可运行，43类待开发**。完整的[开发思路、批次及验收计划](docs/development-plan.md)和[机器可读排期](catalog/development-plan.json)已建立。主入口是 [跨端操作说明](WORKFLOW.md)，通过请求文件、任务卡、资料获取、计算、预览、验收和成果包完成一次出图。当前 Codex 环境已实测；WorkBuddy、豆包等客户端通过同一文件与命令协议使用，是否可直接调用取决于其本地工具权限。
 
 需要 Python 3.11 及以上版本和中文字体。本地已在 Windows / Python 3.12 验证。首次下载并安装（包含公开地图取数依赖，不需要模型API密钥）：
 
@@ -30,7 +30,7 @@ python -m workflow start projects/current/request.json
 
 没有命令工具时，可将已保存的请求文件拖到“运行工作流.cmd”。已有完整任务也可以使用 `python -m workflow run 任务文件 --out 输出目录`，或拖到“运行出图.cmd”。
 
-当前可运行道路、建筑肌理、用地功能、绿地水体四类基础适配器，支持 SVG / PNG / 矢量 PDF。其余46类仍待实现，目录中的官网证据与建议算法继续作为研究规格保留，不表示全部可运行。
+当前可运行道路、建筑肌理、用地功能、绿地水体，以及新增的建筑密度、街道方向玫瑰图、建筑类型学图录。新增三类支持的首个模式分别为网格轮廓覆盖率、按长度加权的无向道路方位、按面积降序的统一比例轮廓图录，见[空间统计请求示例](examples/request.statistics.json)。SVG/PNG已实测；基础四图另有矢量PDF验证，新增三图PDF版面待单独核对。其余43类保留需求，不会执行替代算法。
 
 成都万象城周边半径5公里的四图已在本地完成实际验证，数据固定为Overture 2026-10-21.0。真实项目资料、图片、成果包和原始缓存不上传到代码仓库；下载仓库后需重新获取自己的资料，或导入另行提供的复跑包。
 
@@ -38,12 +38,13 @@ python -m workflow start projects/current/request.json
 
 - [v0.2 模块与接入范围](docs/implementation-v02.md)
 - [v0.2 验证结果与实测边界](docs/validation-v02.md)
+- [v0.3 新增三类的验证记录](docs/validation-v03.md)
 - `python -m workflow preview 运行目录`：生成自动总览。
 - `python -m workflow repaint 运行目录 --palette monochrome`：复用计算重绘。
 - `python -m workflow audit 运行目录`：检查完整性与统计合计。
 - `python -m workflow bundle 运行目录 --out 成果包.zip`：带配置、数据和代码迁移。
 
-开发检查：`python -m pip install -r requirements-dev.txt`，然后执行 `python -m unittest discover -s tests -v`。GitHub Actions在推送和PR时执行环境、语法、请求Schema和20项离线回归检查，不获取真实场地资料。
+开发检查：`python -m pip install -r requirements-dev.txt`，然后执行 `python -m unittest discover -s tests -v`。GitHub Actions在推送和PR时执行环境、语法、请求Schema和29项离线回归检查，不获取真实场地资料。
 
 本轮以2026-10-25核对的MapToNap英文目录为参照：50类图纸成果；另有7项Deep Analysis研究。网站中的图纸已按输入、关键口径、建议算法、表达、验收和解读边界拆开。
 

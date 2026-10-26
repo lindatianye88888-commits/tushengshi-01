@@ -1,0 +1,18 @@
+{
+  "request_version": "0.1.0",
+  "project": {
+    "name": "成都万象城5km空间统计示例",
+    "center": {"lon": 104.1126387, "lat": 30.6507515, "crs": "EPSG:4326", "label": "成都万象城"},
+    "radius_m": 5000
+  },
+  "diagrams": [
+    {"id": "density", "parameters": {"mode": "coverage", "grid_size_m": 250}},
+    {"id": "orientrose", "parameters": {"bin_count": 18, "weighting": "length", "fold_opposite": true, "include_paths": false}},
+    {"id": "typology", "parameters": {"sort_by": "area_desc", "max_buildings": 24, "min_area_m2": 20, "same_scale": true}}
+  ],
+  "style": {"palette": "atlas", "page": "A3", "language": "zh"},
+  "formats": ["svg", "png"],
+  "data": {"mode": "overture", "offline": false},
+  "requirements_confirmed": false,
+  "authorization_note": "按实际项目记录用户已有的确认或委托；本示例不自动确认。"
+}

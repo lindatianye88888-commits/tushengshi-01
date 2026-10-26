@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 
 from . import TITLE
-from .catalog import DIAGRAMS, IMPLEMENTED, FORMATS, read_json
+from .catalog import DIAGRAMS, IMPLEMENTED, IMPLEMENTATION_SCOPE, DEFAULTS, FORMATS, read_json
 from .task import load_task, write_json, new_task, add_instance, confirm, event, get_instance, parameter
 
 
@@ -109,7 +109,9 @@ def main():
         if args.command == "catalog":
             if args.json:
                 print(json.dumps([{ "id":did,"name":d["name_zh"],"group_id":d["family"],
-                                   "implemented":did in IMPLEMENTED} for did,d in DIAGRAMS.items()],ensure_ascii=False))
+                                   "implemented":did in IMPLEMENTED,
+                                   "implementation_scope":IMPLEMENTATION_SCOPE.get(did),
+                                   "supported_parameters":DEFAULTS.get(did,{})} for did,d in DIAGRAMS.items()],ensure_ascii=False))
                 return 0
             for did, d in DIAGRAMS.items():
                 print(f"{did:20} {d['name_zh']}  {'可运行' if did in IMPLEMENTED else '待开发'}")

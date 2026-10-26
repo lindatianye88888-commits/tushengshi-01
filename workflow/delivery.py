@@ -34,7 +34,7 @@ def bundle(run,path,include_inputs=True):
     entries={}
     tracked={"manifest.json","task.snapshot.json","plan.json","task-cards.md","report.md"}
     for item in manifest["instances"]:
-        tracked.update(record["path"] for record in [item.get("analysis_file"),item.get("statistics_file"),*item.get("files",[])] if record)
+        tracked.update(record["path"] for record in [item.get("analysis_file"),item.get("statistics_file"),item.get("details_file"),*item.get("files",[])] if record)
     tracked.update(asset["path"] for asset in manifest.get("assets",[]))
     for relative in tracked:
         source=inside(run,relative)
@@ -48,10 +48,10 @@ def bundle(run,path,include_inputs=True):
             raise ValueError("此旧版本运行没有冻结输入；请先用新执行器复跑后打包。")
     for source in (ROOT/"workflow").rglob("*.py"):
         entries["workflow/"+source.relative_to(ROOT/"workflow").as_posix()]=source
-    for name in ("diagrams.json","group-task-cards.json"): entries["catalog/"+name]=ROOT/"catalog"/name
+    for name in ("diagrams.json","group-task-cards.json","development-plan.json"): entries["catalog/"+name]=ROOT/"catalog"/name
     for name in ("requirements.txt","requirements-data.txt","WORKFLOW.md","运行工作流.cmd","运行出图.cmd"):
         entries[name]=ROOT/name
-    for name in ("implementation-v02.md","validation-v02.md"):
+    for name in ("implementation-v02.md","validation-v02.md","development-plan.md","validation-v03.md"):
         source=ROOT/"docs"/name
         if source.is_file(): entries["docs/"+name]=source
     for source in (ROOT/"schemas").glob("*.json"): entries["schemas/"+source.name]=source

@@ -1,0 +1,284 @@
+{
+  "schema_version": "0.1.0",
+  "updated_at": "2026-10-25",
+  "runtime_source": "python -m workflow catalog --json",
+  "baseline_version": "0.2.0",
+  "baseline_diagrams": [
+    "fabric",
+    "roads",
+    "landuse",
+    "gw"
+  ],
+  "target_diagram_count": 50,
+  "batches": [
+    {
+      "id": "P1",
+      "target_version": "0.3.0",
+      "status": "local_validated",
+      "diagrams": [
+        {
+          "id": "density",
+          "name": "建筑密度"
+        },
+        {
+          "id": "orientrose",
+          "name": "街道方向玫瑰图"
+        },
+        {
+          "id": "typology",
+          "name": "建筑类型学图录"
+        }
+      ],
+      "new_count": 3,
+      "target_total": 7,
+      "validation_report": "docs/validation-v03.md"
+    },
+    {
+      "id": "P2A",
+      "target_version": "0.4.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "context",
+          "name": "城市区位"
+        },
+        {
+          "id": "location",
+          "name": "区位分析"
+        },
+        {
+          "id": "orient",
+          "name": "场地朝向"
+        },
+        {
+          "id": "pedestrian",
+          "name": "步行网络"
+        },
+        {
+          "id": "combined",
+          "name": "综合叠加分析"
+        },
+        {
+          "id": "fabricplus",
+          "name": "城市肌理 · 综合与标注"
+        },
+        {
+          "id": "connectionfield",
+          "name": "路网关联场"
+        }
+      ],
+      "new_count": 7,
+      "target_total": 14
+    },
+    {
+      "id": "P2B",
+      "target_version": "0.5.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "poitype",
+          "name": "设施类型图"
+        },
+        {
+          "id": "sitemap",
+          "name": "设施标注图"
+        },
+        {
+          "id": "poiheat",
+          "name": "设施密度热力"
+        },
+        {
+          "id": "voronoi",
+          "name": "服务范围"
+        },
+        {
+          "id": "urbangrid",
+          "name": "城市数据 · 网格"
+        },
+        {
+          "id": "urbanstations",
+          "name": "城市数据 · 节点"
+        },
+        {
+          "id": "nodes",
+          "name": "节点分析"
+        }
+      ],
+      "new_count": 7,
+      "target_total": 21
+    },
+    {
+      "id": "P3",
+      "target_version": "0.6.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "access",
+          "name": "可达性分析"
+        },
+        {
+          "id": "walkroutes",
+          "name": "可达性路径"
+        },
+        {
+          "id": "transit",
+          "name": "公共交通可达性"
+        },
+        {
+          "id": "radialnet",
+          "name": "中心可达性图"
+        },
+        {
+          "id": "stayplaces",
+          "name": "停留空间与连接"
+        },
+        {
+          "id": "vitality",
+          "name": "街道活力"
+        }
+      ],
+      "new_count": 6,
+      "target_total": 27
+    },
+    {
+      "id": "P4",
+      "target_version": "0.7.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "contour",
+          "name": "地形等高线"
+        },
+        {
+          "id": "aspect",
+          "name": "坡度与排水"
+        },
+        {
+          "id": "wireframe",
+          "name": "地形线阵"
+        }
+      ],
+      "new_count": 3,
+      "target_total": 30
+    },
+    {
+      "id": "P5",
+      "target_version": "0.8.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "sun",
+          "name": "太阳轨迹"
+        },
+        {
+          "id": "climtemp",
+          "name": "全年气温"
+        },
+        {
+          "id": "climprecip",
+          "name": "全年降水"
+        },
+        {
+          "id": "climover",
+          "name": "年度气候"
+        },
+        {
+          "id": "climsolar",
+          "name": "太阳辐射"
+        }
+      ],
+      "new_count": 5,
+      "target_total": 35
+    },
+    {
+      "id": "P6",
+      "target_version": "0.9.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "massing",
+          "name": "建筑体量"
+        },
+        {
+          "id": "isogrid",
+          "name": "轴测体量图"
+        },
+        {
+          "id": "lineaxo",
+          "name": "线稿轴测"
+        },
+        {
+          "id": "sunaxo",
+          "name": "日照与风环境轴测"
+        },
+        {
+          "id": "axocallout",
+          "name": "轴测放大分析图"
+        }
+      ],
+      "new_count": 5,
+      "target_total": 40
+    },
+    {
+      "id": "P7",
+      "target_version": "0.10.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "insetboard",
+          "name": "场地圆形分析拼图"
+        },
+        {
+          "id": "mappingboard",
+          "name": "场地拼贴图"
+        },
+        {
+          "id": "zoningplan",
+          "name": "功能分区总图"
+        },
+        {
+          "id": "oppcon",
+          "name": "机遇与限制分析"
+        }
+      ],
+      "new_count": 4,
+      "target_total": 44
+    },
+    {
+      "id": "P8",
+      "target_version": "1.0.0",
+      "status": "planned",
+      "diagrams": [
+        {
+          "id": "viewcones",
+          "name": "视线分析"
+        },
+        {
+          "id": "noise",
+          "name": "噪声分析"
+        },
+        {
+          "id": "noisemap",
+          "name": "噪声分析 · 声音地形"
+        },
+        {
+          "id": "soundmap",
+          "name": "声源分布图"
+        },
+        {
+          "id": "wind",
+          "name": "风环境流线"
+        },
+        {
+          "id": "windsim",
+          "name": "风环境 · 流体模拟"
+        }
+      ],
+      "new_count": 6,
+      "target_total": 50
+    }
+  ],
+  "last_verified_version": "0.3.0",
+  "implemented_count": 7,
+  "remaining_count": 43
+}

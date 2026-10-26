@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
-from .analysis import analyze, ALGORITHM_VERSION
+from .analysis import analyze, algorithm_version
 from .catalog import read_json
 from .compiler import prepare, task_card_markdown
 from .spatial import digest, file_hash
@@ -31,7 +31,13 @@ def write_analysis_files(result,item_dir):
     with table_path.open("w",encoding="utf-8-sig",newline="") as stream:
         writer=csv.DictWriter(stream,fieldnames=["category","value","unit","share_percent","analysis_area_percent"])
         writer.writeheader();writer.writerows(result["table"])
-    return metric_path,table_path
+    detail_path = None
+    if result.get("detail_table"):
+        detail_path = item_dir/"details.csv"
+        with detail_path.open("w", encoding="utf-8-sig", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=list(result["detail_table"][0]))
+            writer.writeheader();writer.writerows(result["detail_table"])
+    return metric_path,table_path,detail_path
 
 
 def execute(task_path, output_root):
@@ -66,7 +72,7 @@ def execute(task_path, output_root):
             item_dir.mkdir()
             params = {k: v["value"] for k, v in item["parameters"].items()}
             dataset = resources[item["required_data"][0]]
-            key = digest({"algorithm": ALGORITHM_VERSION, "diagram": item["diagram_id"],
+            key = digest({"algorithm": algorithm_version(item["diagram_id"]), "diagram": item["diagram_id"],
                           "parameters": {k:v for k,v in params.items() if k!="show_names"},
                           "project": spatial_signature(task["project"]),
                           "data_hash": dataset["sha256"], "data_metadata": dataset["metadata"]})
@@ -83,9 +89,11 @@ def execute(task_path, output_root):
                 write_json(cache_path, {"result": result, "result_sha256": digest(result)})
                 item["analysis_cache_hit"] = False
             item["analysis_key"] = key
-            metric_path,table_path = write_analysis_files(result,item_dir)
+            metric_path,table_path,detail_path = write_analysis_files(result,item_dir)
             item["analysis_file"] = {"path": str(metric_path.relative_to(run_dir)), "sha256": file_hash(metric_path)}
             item["statistics_file"]={"path":str(table_path.relative_to(run_dir)),"sha256":file_hash(table_path)}
+            if detail_path:
+                item["details_file"]={"path":str(detail_path.relative_to(run_dir)),"sha256":file_hash(detail_path)}
             item["run_status"] = "computed"
             paths = export(result, task, item, item_dir)
             for path in paths:
@@ -121,6 +129,8 @@ def report(manifest):
         lines.extend(f"- [{f['format']}]({f['path'].replace(chr(92), '/')})" for f in item["files"])
         if item.get("statistics_file"):
             lines.append(f"- [统计表 CSV]({item['statistics_file']['path'].replace(chr(92), '/')})")
+        if item.get("details_file"):
+            lines.append(f"- [计算明细 CSV]({item['details_file']['path'].replace(chr(92), '/')})")
         if item.get("inherited_reviews"):
             lines.extend(f"- 沿用核对记录：{review['reviewer']} / {review['decision']} / {review['note']}" for review in item["inherited_reviews"])
         lines.extend(f"- 待处理：{b}" for b in item["blockers"])

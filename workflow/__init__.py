@@ -8,5 +8,5 @@ vendor = Path(__file__).resolve().parents[1] / ".vendor"
 if vendor.is_dir():
     sys.path.append(str(vendor))
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 TITLE = "图省事 01｜建筑景观规划·分析图工作流"

@@ -1,0 +1,233 @@
+{
+  "schema_version": "0.1.0",
+  "snapshot_date": "2026-10-25",
+  "status": "requirements_design_only",
+  "not_in_base_diagram_count": true,
+  "module_count": 7,
+  "interpretation": "7项是研究模块，可能生成多种图纸、指标或动画；本轮仅核对公开说明，未逐项实测。",
+  "source_urls": [
+    "https://maptonap.com/",
+    "https://maptonap.com/architecture-site-analysis/",
+    "https://www.maptonap.com/lab"
+  ],
+  "proposed_advanced_tools": [
+    {
+      "name": "depthmapX",
+      "purpose": "视域、VGA与角度线段分析",
+      "source": "https://github.com/SpaceGroupUCL/depthmapX"
+    }
+  ],
+  "modules": [
+    {
+      "id": "day_in_site",
+      "name": "场地的一天",
+      "source_name": "A day in the site",
+      "confirm": [
+        "日期和时区",
+        "地面或立面",
+        "时间步长",
+        "动画、逐时图或累计日照"
+      ],
+      "data": [
+        "建筑轮廓与高度",
+        "场地及地面",
+        "太阳参数",
+        "若显示营业与公交则另需其时间资料"
+      ],
+      "analysis": [
+        "太阳位置",
+        "三维射线/阴影",
+        "按时刻累计或生成帧"
+      ],
+      "outputs": [
+        "逐时日照图",
+        "累计日照图",
+        "动画"
+      ],
+      "boundary": "几何日照与区域云量、树冠和微气候分开；不直接当作法定日照报告。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "walk_pulse",
+      "name": "步行脉冲",
+      "source_name": "Walk pulse",
+      "confirm": [
+        "入口",
+        "步速",
+        "时间阈值",
+        "开放时间与人群"
+      ],
+      "data": [
+        "可通行路网",
+        "入口",
+        "障碍与门禁"
+      ],
+      "analysis": [
+        "带时间权重的最短路",
+        "网络等时范围",
+        "路径动画"
+      ],
+      "outputs": [
+        "等时图",
+        "到达时间图",
+        "路线动画"
+      ],
+      "boundary": "路线依赖真实通行条件；不得用直线距离圈替代路网。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "sightlines",
+      "name": "视域与可见性图",
+      "source_name": "Sightlines",
+      "confirm": [
+        "从哪里看什么",
+        "单点或全域",
+        "二维或三维",
+        "观察高度、网格"
+      ],
+      "data": [
+        "障碍几何",
+        "观察点",
+        "需要时的高度与地形"
+      ],
+      "analysis": [
+        "单点isovist",
+        "射线遮挡",
+        "全域VGA"
+      ],
+      "outputs": [
+        "单点视域",
+        "可见性指标图"
+      ],
+      "boundary": "照片展板、二维视域、三维遮挡与VGA指标分别记录；可见面积不是全部VGA。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "design_impact",
+      "name": "方案影响",
+      "source_name": "Design impact",
+      "confirm": [
+        "基准与方案版本",
+        "需要比较的指标",
+        "日期",
+        "保护对象及起终点"
+      ],
+      "data": [
+        "基准模型",
+        "拟建体块",
+        "需要时的路网与观察点"
+      ],
+      "analysis": [
+        "基准与方案分别计算",
+        "按统一口径作日照、视域或绕行差值"
+      ],
+      "outputs": [
+        "日照差值图",
+        "视域差值图",
+        "步行绕行差值图"
+      ],
+      "boundary": "共享基准参数；几何差异不能自动解释为规划合规或实际损失。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "fifteen_minute_city",
+      "name": "15分钟城市",
+      "source_name": "15-minute city",
+      "confirm": [
+        "设施类别",
+        "步速",
+        "时间阈值",
+        "最近一家、一定数量或全部类别",
+        "营业条件"
+      ],
+      "data": [
+        "可通行路网",
+        "设施与站口",
+        "营业信息（如采用）"
+      ],
+      "analysis": [
+        "按设施类别多源最短路",
+        "街段赋值",
+        "分类覆盖统计"
+      ],
+      "outputs": [
+        "分类服务时间图",
+        "设施覆盖图",
+        "缺口说明"
+      ],
+      "boundary": "数据缺失与实际缺少服务分开；综合评分公式需显式定义。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "footfall",
+      "name": "逐时人流估算",
+      "source_name": "Footfall",
+      "confirm": [
+        "工作日或周末",
+        "时间段",
+        "出行生成和吸引参数",
+        "相对强弱或人/小时"
+      ],
+      "data": [
+        "人口或居住容量",
+        "目的地与营业",
+        "路网",
+        "校准调查（定量时）"
+      ],
+      "analysis": [
+        "出行生成",
+        "目的地选择",
+        "路径分配",
+        "与实测校准"
+      ],
+      "outputs": [
+        "街段相对强度",
+        "逐时变化",
+        "情景动画"
+      ],
+      "boundary": "无校准资料时只交付相对情景模拟；动画不是实测人流。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    },
+    {
+      "id": "space_syntax",
+      "name": "空间句法",
+      "source_name": "Space syntax",
+      "confirm": [
+        "整合度或选择度",
+        "角度线段分析方法",
+        "400/800/1200m或其他半径",
+        "标准化方法",
+        "网络缓冲区"
+      ],
+      "data": [
+        "拓扑正确的路网",
+        "明确的分析和数据范围"
+      ],
+      "analysis": [
+        "角度线段分析",
+        "按指定方法归一化",
+        "半径情景比较"
+      ],
+      "outputs": [
+        "整合度图",
+        "选择度图"
+      ],
+      "boundary": "普通距离介数不冒充角度选择度；句法指标不直接等于人流和商业价值。",
+      "implementation_status": "not_implemented",
+      "website_default_parameters": "not_verified",
+      "proposed_method_is_our_design": true
+    }
+  ]
+}

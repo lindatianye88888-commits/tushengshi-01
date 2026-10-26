@@ -1,0 +1,2635 @@
+{
+  "schema_version": "0.1.0",
+  "snapshot_date": "2026-10-25",
+  "status": "requirements_design_only",
+  "source_home": "https://maptonap.com/",
+  "source_app": "https://maptonap.com/app?free=1&lang=en",
+  "source_catalogue_count": 50,
+  "deep_analysis_module_count": 7,
+  "interpretation": "官网目录与公开菜单已经核对；算法、提问、验收及开发优先级为建议设计；全部自建绘图能力尚未实现。",
+  "numbering_policy": "id为稳定标识，source_number仅记录本次官网顺序；官网重排不改变项目中的图类身份。",
+  "observations": {
+    "initial_menu_evidence": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909",
+    "free_sample_evidence": "ev_f0e46305e20efe82d242432fac0bbf28413cb25cd3d9e8e550d3d5591de6af46",
+    "paid_features_executed": false,
+    "baseline_algorithms_audited": false
+  },
+  "historical_changes": [
+    {
+      "kind": "added",
+      "ids": [
+        "noisemap",
+        "windsim",
+        "fabricplus"
+      ]
+    },
+    {
+      "kind": "catalogue_slot_changed",
+      "old_name": "Daylight Hours",
+      "old_source_number": 46,
+      "current_name": "Sun & Wind Axonometric",
+      "current_source_number": 49,
+      "note": "两者不是同一能力，不能仅靠序号替换。"
+    }
+  ],
+  "families": [
+    {
+      "id": "base_map",
+      "name": "底图分类与标注",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "diagram_count": 11
+    },
+    {
+      "id": "spatial_statistics",
+      "name": "几何处理与空间统计",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "diagram_count": 11
+    },
+    {
+      "id": "routing",
+      "name": "路网计算",
+      "proposed_tools": [
+        "OSMnx",
+        "NetworkX",
+        "QGIS"
+      ],
+      "diagram_count": 3
+    },
+    {
+      "id": "terrain",
+      "name": "高程处理",
+      "proposed_tools": [
+        "GDAL",
+        "Rasterio",
+        "pysheds",
+        "SVG"
+      ],
+      "diagram_count": 3
+    },
+    {
+      "id": "climate",
+      "name": "气象与天文统计",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "diagram_count": 5
+    },
+    {
+      "id": "projection",
+      "name": "三维建模与投影",
+      "proposed_tools": [
+        "Three.js",
+        "地理坐标转换",
+        "SVG"
+      ],
+      "diagram_count": 4
+    },
+    {
+      "id": "environment",
+      "name": "环境估算、模拟与视线",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "diagram_count": 6
+    },
+    {
+      "id": "composition",
+      "name": "组合图与设计解读",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "diagram_count": 7
+    }
+  ],
+  "data_resource_ids": [
+    "analysis_boundary",
+    "analysis_units",
+    "building_functions",
+    "building_heights",
+    "buildings",
+    "constraints",
+    "context_boundaries",
+    "context_maps",
+    "drainage_infrastructure",
+    "elevation_ground",
+    "entrances",
+    "field_observations",
+    "green_water",
+    "landuse",
+    "noise_sources",
+    "orientation_reference",
+    "pedestrian_access",
+    "pois",
+    "program_zones",
+    "project_site",
+    "public_spaces",
+    "roads",
+    "selected_child_diagram_dependencies",
+    "simulation_domain",
+    "solar_dates",
+    "source_images",
+    "street_photos",
+    "transit_stops",
+    "weather_precipitation",
+    "weather_radiation",
+    "weather_temperature",
+    "weather_wind"
+  ],
+  "diagrams": [
+    {
+      "id": "axocallout",
+      "source_number": 1,
+      "source_name": "Axonometric Callouts",
+      "app_name": "Axonometric Callouts",
+      "name_zh": "轴测放大分析图",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "怎样用轴测与放大节点讲清重点？",
+      "questions_to_confirm": [
+        "放大对象",
+        "放大窗口数量",
+        "体块精度和布局"
+      ],
+      "required_data": [
+        "buildings",
+        "building_heights",
+        "roads",
+        "project_site"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "复用体块模型",
+        "选取重点对象",
+        "为窗口与总图建立关联"
+      ],
+      "proposed_drawing": "主轴测图、圆形细节窗和编号引线。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "放大窗对象能回到总图",
+        "比例变化明确",
+        "标签不遮挡"
+      ],
+      "interpretation_boundary": "主要是已有结果的组合表达；不自动增加分析结论。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "insetboard",
+      "source_number": 2,
+      "source_name": "Site Inset Board",
+      "app_name": "Site Inset Board",
+      "name_zh": "场地圆形分析拼图",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "如何用一个主图和若干小图讲清场地？",
+      "questions_to_confirm": [
+        "主图范围",
+        "四个小图内容",
+        "统一或分别使用比例尺"
+      ],
+      "required_data": [
+        "project_site"
+      ],
+      "conditional_data": [
+        {
+          "when": "选择某个子图",
+          "data": [
+            "selected_child_diagram_dependencies"
+          ],
+          "note": "按子图实际依赖展开，不无条件索要全部资料。"
+        }
+      ],
+      "variants": [],
+      "proposed_analysis": [
+        "读取已计算图层",
+        "构建主图与四个分析视窗",
+        "自动布局"
+      ],
+      "proposed_drawing": "重点主图与四个圆形小图、统一图例和编号。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "每个小图内容有来源",
+        "各视窗比例尺分别正确",
+        "同一位置保持对齐"
+      ],
+      "interpretation_boundary": "它依赖所选子图的数据；无法生成的子图应明确缺失或由用户替换。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "zoningplan",
+      "source_number": 3,
+      "source_name": "Zoning Plan",
+      "app_name": "Zoning Plan",
+      "name_zh": "功能分区总图",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "需要表达现状功能，还是提出方案功能分区？",
+      "questions_to_confirm": [
+        "现状/规划法定/拟建方案",
+        "分区边界与面积要求",
+        "路径和标签"
+      ],
+      "required_data": [
+        "project_site"
+      ],
+      "conditional_data": [
+        {
+          "when": "现状功能",
+          "data": [
+            "landuse"
+          ]
+        },
+        {
+          "when": "方案分区",
+          "data": [
+            "program_zones"
+          ],
+          "note": "可以人工输入，或在目标和约束明确后提出草案，由用户确认。"
+        }
+      ],
+      "variants": [
+        "现状功能总图",
+        "经确认的拟建功能分区"
+      ],
+      "proposed_analysis": [
+        "现状模式复用属性面",
+        "方案模式读取或经确认生成分区",
+        "核对分区面积与冲突"
+      ],
+      "proposed_drawing": "渐变或分类分区、路径、编号和功能标签。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "现状与方案标签明确",
+        "分区拓扑和面积可核对",
+        "方案内容经过使用者确认"
+      ],
+      "interpretation_boundary": "不能把自动提出的功能分区包装成现状事实或法定规划。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "viewcones",
+      "source_number": 4,
+      "source_name": "Visual Analysis",
+      "app_name": "Visual Analysis",
+      "name_zh": "视线分析",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "从哪些真实位置能够看见场地，照片如何对应？",
+      "questions_to_confirm": [
+        "观察目标",
+        "视点数量与高度",
+        "真实照片或几何视域",
+        "照片朝向和时间"
+      ],
+      "required_data": [
+        "street_photos",
+        "buildings",
+        "building_heights",
+        "project_site"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "真实街景照片与编号视锥展板"
+      ],
+      "proposed_analysis": [
+        "获取有位置和相机信息的照片",
+        "计算视锥及遮挡",
+        "照片投影或人工复核场地标注"
+      ],
+      "proposed_drawing": "平面编号视锥、照片面板、目标强调与摄影者署名。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "照片与视点编号对应",
+        "无照片时不生成虚构街景",
+        "目标高亮位置经过核对"
+      ],
+      "interpretation_boundary": "这是带照片的视觉展板；与Deep Analysis的单点视域/VGA指标并不等同。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "lineaxo",
+      "source_number": 5,
+      "source_name": "Line Axonometric",
+      "app_name": "Line Axonometric",
+      "name_zh": "线稿轴测",
+      "family": "projection",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "怎样用干净的线稿轴测表达场地？",
+      "questions_to_confirm": [
+        "轴测角度",
+        "重点场地",
+        "隐藏线或透视线策略"
+      ],
+      "required_data": [
+        "buildings",
+        "building_heights",
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "生成体块",
+        "提取边线并投影",
+        "进行隐藏线处理与图形简化"
+      ],
+      "proposed_drawing": "线稿底景与重点区域强调色，必要时叠加道路。",
+      "proposed_tools": [
+        "Three.js",
+        "地理坐标转换",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "主要边线连续",
+        "隐藏线策略一致",
+        "重点范围准确落位"
+      ],
+      "interpretation_boundary": "网站称平面斜轴测；我们需明确具体投影而不是按名称混用透视。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "radialnet",
+      "source_number": 6,
+      "source_name": "Central & Accessible",
+      "app_name": "Central & Accessible",
+      "name_zh": "中心可达性图",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "如何突出场地与周边目的地的中心联系？",
+      "questions_to_confirm": [
+        "目的地选择",
+        "放射直线或真实路线",
+        "等高线或距离圈的含义"
+      ],
+      "required_data": [
+        "project_site",
+        "pois"
+      ],
+      "conditional_data": [
+        {
+          "when": "显示真实路线",
+          "data": [
+            "roads",
+            "pedestrian_access",
+            "entrances"
+          ]
+        },
+        {
+          "when": "显示等高线",
+          "data": [
+            "elevation_ground"
+          ]
+        }
+      ],
+      "variants": [],
+      "proposed_analysis": [
+        "按明确规则选择目的地",
+        "生成放射联系或复用路网结果",
+        "按需叠加地形"
+      ],
+      "proposed_drawing": "场地居中、目的地放射连接及背景层。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "每条联系有真实目的地",
+        "直线连线不标真实步行路线",
+        "等高线必须来自高程数据"
+      ],
+      "interpretation_boundary": "菜单说明是组合图；不默认它计算了接近中心性、介数或空间句法。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "oppcon",
+      "source_number": 7,
+      "source_name": "Opportunities & Constraints",
+      "app_name": "Opportunities & Constraints",
+      "name_zh": "机遇与限制分析",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些事实构成设计机会或限制，为什么？",
+      "questions_to_confirm": [
+        "项目目标",
+        "约束资料",
+        "判断规则与人工批注"
+      ],
+      "required_data": [
+        "project_site",
+        "landuse",
+        "roads",
+        "green_water",
+        "constraints",
+        "field_observations"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "汇集已计算事实",
+        "按显式规则筛选候选机会/约束",
+        "建立证据对应",
+        "由设计师确认判断"
+      ],
+      "proposed_drawing": "分类型区域、箭头和简洁注释，每项关联来源。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "事实、推断、建议三者可区分",
+        "每条判断有证据",
+        "不凭空制造限制条件"
+      ],
+      "interpretation_boundary": "不存在通用的自动正确策略；人工判断可以保留为可编辑标注。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "stayplaces",
+      "source_number": 8,
+      "source_name": "Stay Places & Connections",
+      "app_name": "Stay Places & Connections",
+      "name_zh": "停留空间与连接",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些空间可供停留，它们如何步行连接？",
+      "questions_to_confirm": [
+        "候选停留空间",
+        "实际开放与可停留条件",
+        "连接起终点"
+      ],
+      "required_data": [
+        "public_spaces",
+        "roads",
+        "pedestrian_access",
+        "entrances"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "筛选真实公共空间或人工确认候选点",
+        "求最短步行连接",
+        "按需统计距离"
+      ],
+      "proposed_drawing": "停留点、空间轮廓、步行路线和节点说明。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "停留点存在且开放性有记录",
+        "路径真实可通行",
+        "推荐与已观察使用分开"
+      ],
+      "interpretation_boundary": "存在开敞空间不代表舒适、可进入或有人停留；后者需现场资料。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "noisemap",
+      "source_number": 9,
+      "source_name": "Noise Topography",
+      "app_name": "Road Noise · Aural Topography",
+      "name_zh": "噪声分析 · 声音地形",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "建筑遮挡下道路声源的相对传播形态怎样？",
+      "questions_to_confirm": [
+        "道路声源强度规则",
+        "受声位置与高度",
+        "是否只采用二维遮挡及距离衰减"
+      ],
+      "required_data": [
+        "roads",
+        "buildings",
+        "noise_sources"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "从道路采样声源",
+        "射线检查建筑遮挡",
+        "按选定声学简化合并声级",
+        "以对数能量叠加声源"
+      ],
+      "proposed_drawing": "栅格声级或相对声场，绘制明确间隔的分带。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "声级以能量而非直接相加",
+        "单声源距离衰减和遮挡有基准例",
+        "无实测校准需标估算"
+      ],
+      "interpretation_boundary": "官网称3dB分带并按道路等级估算声源；工程精度需要交通量、立面、地形等额外模型。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "windsim",
+      "source_number": 10,
+      "source_name": "Wind Flow Simulation",
+      "app_name": "Wind · Flow Simulation",
+      "name_zh": "风环境 · 流体模拟",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "给定入流方向时，建筑间怎样形成避风区和风道？",
+      "questions_to_confirm": [
+        "入流方向与量纲",
+        "障碍物高度处理",
+        "网格、边界和收敛条件"
+      ],
+      "required_data": [
+        "buildings",
+        "weather_wind",
+        "simulation_domain"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "二维物理模拟（独立于示意图）"
+      ],
+      "proposed_analysis": [
+        "建立二维障碍网格",
+        "运行明确边界的LBM或其他已验证求解",
+        "检查稳定性与收敛"
+      ],
+      "proposed_drawing": "速度场、流线及相对避风区；显示模拟设定。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "无障碍基准和简单障碍测试通过",
+        "有收敛/稳定判据",
+        "格子单位与物理单位区别清楚"
+      ],
+      "interpretation_boundary": "官网声明为GPU二维LBM；二维模拟不直接代表三维行人高度风环境或真实阵风。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "fabricplus",
+      "source_number": 11,
+      "source_name": "Fabric Generalisation",
+      "app_name": "Urban Fabric · Generalisation",
+      "name_zh": "城市肌理 · 综合与标注",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "如何把细碎建筑概化成适合当前尺度的街块？",
+      "questions_to_confirm": [
+        "目标比例尺",
+        "允许合并的距离",
+        "院落保留阈值与简化容差"
+      ],
+      "required_data": [
+        "buildings",
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "邻近建筑形态学合并",
+        "小洞阈值填补",
+        "拓扑保持简化",
+        "沿道路布局名称"
+      ],
+      "proposed_drawing": "绘制概化街块、场地与自动街名。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "保存原始分析图层",
+        "简化不跨越应保留的道路和水体",
+        "街名可读"
+      ],
+      "interpretation_boundary": "概化几何只用于表达；不可回流替代原建筑做精确面积统计。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "fabric",
+      "source_number": 12,
+      "source_name": "Urban Fabric",
+      "app_name": "Urban Fabric",
+      "name_zh": "城市肌理",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        },
+        {
+          "type": "observed_free_sample_output",
+          "evidence_id": "ev_f0e46305e20efe82d242432fac0bbf28413cb25cd3d9e8e550d3d5591de6af46",
+          "numerical_accuracy": "not_validated"
+        }
+      ],
+      "analysis_question": "建筑与开敞空间怎样组成城市肌理？",
+      "questions_to_confirm": [
+        "统计范围",
+        "保留哪些建筑",
+        "是否展示面积指标"
+      ],
+      "required_data": [
+        "buildings"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "修复并裁切建筑轮廓",
+        "重叠处理",
+        "建筑覆盖面积统计"
+      ],
+      "proposed_drawing": "建筑实底、空地留白，场地作强调色。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "面积采用原始分析几何",
+        "覆盖率分母明确",
+        "水体与公共开放空间的含义分别说明"
+      ],
+      "interpretation_boundary": "未建成区域不自动等于可进入的公共空间。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "roads",
+      "source_number": 13,
+      "source_name": "Roads & Streets",
+      "app_name": "Roads & Streets",
+      "name_zh": "道路与街道",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        },
+        {
+          "type": "observed_free_sample_output",
+          "evidence_id": "ev_f0e46305e20efe82d242432fac0bbf28413cb25cd3d9e8e550d3d5591de6af46",
+          "numerical_accuracy": "not_validated"
+        }
+      ],
+      "analysis_question": "道路如何分级、连接，哪些道路靠近场地？",
+      "questions_to_confirm": [
+        "分析范围",
+        "道路等级映射",
+        "是否显示步道"
+      ],
+      "required_data": [
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "按属性分类",
+        "裁切道路",
+        "去重后分级统计长度"
+      ],
+      "proposed_drawing": "按等级映射线宽与颜色，叠加场地、路名、比例尺。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "图例与道路分类一致",
+        "每类长度可回算",
+        "立交不能误作平面交叉口"
+      ],
+      "interpretation_boundary": "反映道路结构；没有交通量资料时不能说明拥堵或承载力。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "landuse",
+      "source_number": 14,
+      "source_name": "Functional Areas",
+      "app_name": "Functional Areas",
+      "name_zh": "功能分区",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        },
+        {
+          "type": "observed_free_sample_output",
+          "evidence_id": "ev_f0e46305e20efe82d242432fac0bbf28413cb25cd3d9e8e550d3d5591de6af46",
+          "numerical_accuracy": "not_validated"
+        }
+      ],
+      "analysis_question": "周边已有建筑或地块分别承载哪些功能？",
+      "questions_to_confirm": [
+        "建筑功能或地块用地",
+        "分类体系",
+        "未知类处理"
+      ],
+      "required_data": [
+        "buildings",
+        "landuse"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "建筑功能分类",
+        "现状地块用地分类"
+      ],
+      "proposed_analysis": [
+        "映射已有功能属性",
+        "保留未知标签",
+        "分类统计面积"
+      ],
+      "proposed_drawing": "分类面填色，弱化道路底图，显示各类占比。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "明确占比的分母",
+        "未知类不强行归类",
+        "互斥分类的面积总和可核对"
+      ],
+      "interpretation_boundary": "现状功能、法定用地和拟建方案分区必须分别标明；不互相推断。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "gw",
+      "source_number": 15,
+      "source_name": "Green & Water",
+      "app_name": "Green & Water",
+      "name_zh": "绿地与水系",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        },
+        {
+          "type": "observed_free_sample_output",
+          "evidence_id": "ev_f0e46305e20efe82d242432fac0bbf28413cb25cd3d9e8e550d3d5591de6af46",
+          "numerical_accuracy": "not_validated"
+        }
+      ],
+      "analysis_question": "绿地和水体在哪里，各占多少面积？",
+      "questions_to_confirm": [
+        "绿地范围定义",
+        "水体类别",
+        "距离算到边缘或入口"
+      ],
+      "required_data": [
+        "green_water"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "分类裁切",
+        "同类面合并去重",
+        "面积与最近距离计算"
+      ],
+      "proposed_drawing": "绿地、水面分别着色，必要时标出最近公园与面积。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "重叠面不重复计量",
+        "统计范围与图示一致",
+        "公园边缘距离和到入口路程分开"
+      ],
+      "interpretation_boundary": "地图未记录绿地时标为数据未知；公开地图不能自动提供树种或树冠调查。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "transit",
+      "source_number": 16,
+      "source_name": "Transit Access",
+      "app_name": "Transit Access",
+      "name_zh": "公共交通可达性",
+      "family": "routing",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "从场地到公交、轨道站点实际要走多久？",
+      "questions_to_confirm": [
+        "出发入口",
+        "站点或站口",
+        "步行速度和时间阈值"
+      ],
+      "required_data": [
+        "transit_stops",
+        "project_site"
+      ],
+      "conditional_data": [
+        {
+          "when": "计算真实到站步行时间",
+          "data": [
+            "roads",
+            "pedestrian_access",
+            "entrances"
+          ]
+        }
+      ],
+      "variants": [],
+      "proposed_analysis": [
+        "构建可步行拓扑",
+        "起点和站口接入网络",
+        "按通行成本求最短路"
+      ],
+      "proposed_drawing": "绘制站点、线路背景、步行路径与到站时间。",
+      "proposed_tools": [
+        "OSMnx",
+        "NetworkX",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "路线没有穿越墙体和禁行段",
+        "时间由路段成本累计",
+        "不可达站点明确列出"
+      ],
+      "interpretation_boundary": "到站可达性不包含候车、车次、票价及完整公共交通行程。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "walkroutes",
+      "source_number": 17,
+      "source_name": "Walk Accessibility",
+      "app_name": "Walk Accessibility",
+      "name_zh": "可达性路径",
+      "family": "routing",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "沿真实路网去选定目的地应该怎么走？",
+      "questions_to_confirm": [
+        "起点",
+        "目的地及最近规则",
+        "步行条件与步速"
+      ],
+      "required_data": [
+        "roads",
+        "pedestrian_access",
+        "pois",
+        "entrances"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "把起终点接入可通行路网",
+        "按路程或耗时寻找最短路径",
+        "逐段累计时距"
+      ],
+      "proposed_drawing": "突出到各类目的地的路线、编号、距离和分钟数。",
+      "proposed_tools": [
+        "OSMnx",
+        "NetworkX",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "路径连续并落在允许通行的边上",
+        "最近目的地按所选路网成本判断",
+        "断路与不可达不画直线冒充"
+      ],
+      "interpretation_boundary": "与范围等时图不同，本图输出具体目的地路线。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "noise",
+      "source_number": 18,
+      "source_name": "Noise Analysis",
+      "app_name": "Noise Analysis",
+      "name_zh": "噪声分析",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些区域可能受道路噪声影响更大？",
+      "questions_to_confirm": [
+        "相对影响分区或声级估算",
+        "道路声源属性",
+        "情景时段"
+      ],
+      "required_data": [
+        "roads",
+        "noise_sources"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "道路相对噪声影响示意"
+      ],
+      "proposed_analysis": [
+        "按道路等级或已知声源强度赋值",
+        "根据距离构建可解释的影响分区"
+      ],
+      "proposed_drawing": "道路声源与相对影响色带，保留估算标识。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "没有实测或声源模型时不标实测dB",
+        "分级依据可查"
+      ],
+      "interpretation_boundary": "基础噪声分区与含建筑屏蔽的声音地形图是两种不同复杂度。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "sun",
+      "source_number": 19,
+      "source_name": "Sun Path & Wind",
+      "app_name": "Sun Path",
+      "name_zh": "太阳轨迹",
+      "family": "climate",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "太阳在不同季节沿什么方向和高度运动？",
+      "questions_to_confirm": [
+        "经纬度",
+        "日期或节气",
+        "时区及时间步长"
+      ],
+      "required_data": [
+        "project_site",
+        "solar_dates"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "计算太阳方位角与高度角",
+        "筛选地平线上时刻",
+        "转换为极坐标或场地叠加轨迹"
+      ],
+      "proposed_drawing": "绘制夏至、冬至和分点日轨迹，标明时间与真北。",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "日期时区可查",
+        "位置与太阳方向可交叉核验",
+        "太阳在地平线下不画成受晒"
+      ],
+      "interpretation_boundary": "太阳轨迹不等于建筑遮挡后的日照时长；首页与App名称略有差异。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "wind",
+      "source_number": 20,
+      "source_name": "Wind Flow",
+      "app_name": "Wind Flow",
+      "name_zh": "风环境流线",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "主导风向及建筑周边流线怎样示意？",
+      "questions_to_confirm": [
+        "风统计时段",
+        "来向或流向",
+        "明确是示意还是物理求解"
+      ],
+      "required_data": [
+        "weather_wind",
+        "buildings"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "几何流线示意"
+      ],
+      "proposed_analysis": [
+        "统计风向",
+        "用显式的几何绕避规则生成示意流线"
+      ],
+      "proposed_drawing": "主导风箭头、示意流线及建筑底图。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "风向与统计数据一致",
+        "图题明确示意属性",
+        "不输出未经求解的真实m/s"
+      ],
+      "interpretation_boundary": "公开基础绘制分支是几何绕避；它与新增二维LBM模拟必须分开。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "nodes",
+      "source_number": 21,
+      "source_name": "Node Analysis",
+      "app_name": "Node Analysis",
+      "name_zh": "节点分析",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些设施或交通点需要作为节点表达？",
+      "questions_to_confirm": [
+        "节点类别",
+        "层级依据",
+        "连线代表距离还是关系"
+      ],
+      "required_data": [
+        "pois",
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "按已知类别筛选",
+        "依据显式规则分层",
+        "建立节点与场地的联系"
+      ],
+      "proposed_drawing": "分级点符号、影响圈及关系线。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "每个节点都有真实记录或人工标注来源",
+        "关系线含义写入图例"
+      ],
+      "interpretation_boundary": "不自动解释为路网中心性；资料不足时不编造示意节点。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "context",
+      "source_number": 22,
+      "source_name": "City Context",
+      "app_name": "City Context",
+      "name_zh": "城市区位",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "场地与城市主要结构有什么位置关系？",
+      "questions_to_confirm": [
+        "城市背景范围",
+        "需要突出哪些道路或地标"
+      ],
+      "required_data": [
+        "project_site",
+        "roads",
+        "context_boundaries"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "构建城市与场地两级范围",
+        "筛选背景要素",
+        "计算方位与距离"
+      ],
+      "proposed_drawing": "绘制城市背景与场地定位，突出主要联系。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "场地在各尺度定位一致",
+        "距离与坐标可核对"
+      ],
+      "interpretation_boundary": "侧重位置表达；行政边界与城市中心需要明确来源。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "location",
+      "source_number": 23,
+      "source_name": "Location",
+      "app_name": "Location",
+      "name_zh": "区位分析",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "项目位于哪个区域或国家的什么位置？",
+      "questions_to_confirm": [
+        "定位尺度层级",
+        "行政边界版本",
+        "需要的地名"
+      ],
+      "required_data": [
+        "project_site",
+        "context_boundaries"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "分级定位",
+        "构建嵌套视窗",
+        "按尺度筛选地名"
+      ],
+      "proposed_drawing": "国家、区域、城市的多尺度区位小图。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "各级定位点一致",
+        "边界与地名出处明确",
+        "比例尺随视窗变化"
+      ],
+      "interpretation_boundary": "网页地名搜索结果需要核对，不以同名地点替代项目。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "orient",
+      "source_number": 24,
+      "source_name": "Orientation",
+      "app_name": "Orientation",
+      "name_zh": "场地朝向",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "场地的方位关系是什么？",
+      "questions_to_confirm": [
+        "真北或图纸北",
+        "需要强调的场地主轴"
+      ],
+      "required_data": [
+        "project_site",
+        "orientation_reference"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "坐标方向转换",
+        "真北与版面旋转计算"
+      ],
+      "proposed_drawing": "叠加方位、北向、场地标记与主轴。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "旋转后北箭头仍正确",
+        "场地主轴有来源"
+      ],
+      "interpretation_boundary": "场地朝向图与道路方向统计图是不同任务。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "orientrose",
+      "source_number": 25,
+      "source_name": "Orientation Rose",
+      "app_name": "Orientation Rose",
+      "name_zh": "街道方向玫瑰图",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "街道主要朝哪些方向延伸？",
+      "questions_to_confirm": [
+        "方位分箱",
+        "按长度或条数加权",
+        "是否合并相反方向"
+      ],
+      "required_data": [
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "计算有效街段方位角",
+        "处理双向重复",
+        "分箱加权统计"
+      ],
+      "proposed_drawing": "极坐标玫瑰图、方向色谱与参考道路图。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "角度基准正确",
+        "权重总和可核对",
+        "同一路段不因双向边重复计算"
+      ],
+      "interpretation_boundary": "它统计街道几何方向，不是气象风玫瑰图。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "vitality",
+      "source_number": 26,
+      "source_name": "Street Vitality",
+      "app_name": "Street Vitality",
+      "name_zh": "街道活力",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些街段具备相对活动潜力？",
+      "questions_to_confirm": [
+        "代理指标有哪些",
+        "权重如何设定",
+        "时间情景及是否有实测校准"
+      ],
+      "required_data": [
+        "pois",
+        "roads",
+        "building_functions"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "计算沿街设施、混合功能和连通性等代理变量",
+        "标准化并组合",
+        "若有调查则进行校准"
+      ],
+      "proposed_drawing": "街段分级着色，公开评分组成与时段。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "权重及归一化可查",
+        "对比项目用同一口径",
+        "未校准时只输出相对指数"
+      ],
+      "interpretation_boundary": "设施和路网推导的是代理指标；不能直接标成人/小时。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "access",
+      "source_number": 27,
+      "source_name": "Access Analysis",
+      "app_name": "Access Analysis",
+      "name_zh": "可达性分析",
+      "family": "routing",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "从指定起点能在多少分钟内到达哪些道路或区域？",
+      "questions_to_confirm": [
+        "入口与出发时刻",
+        "直线示意或实际路网",
+        "步速和时间阈值"
+      ],
+      "required_data": [
+        "roads",
+        "pedestrian_access",
+        "entrances"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "直线距离/时间换算示意",
+        "真实路网等时范围"
+      ],
+      "proposed_analysis": [
+        "按所选模式计算直线距离或带通行成本的Dijkstra",
+        "沿边截取可达街段",
+        "构建等时范围时保留不可穿越障碍"
+      ],
+      "proposed_drawing": "绘制时间分级路段及等时区域，标出起点。",
+      "proposed_tools": [
+        "OSMnx",
+        "NetworkX",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "真实路网模式必须有沿路累计成本",
+        "等时多边形不跨越明显障碍",
+        "地图裁切不截断分析网络"
+      ],
+      "interpretation_boundary": "公开基础代码含直线距离换算分支，尚未确认最新成品是否覆盖它；我们的实现必须显式标明模式。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "density",
+      "source_number": 28,
+      "source_name": "Building Density",
+      "app_name": "Building Density",
+      "name_zh": "建筑密度",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "要比较建筑覆盖率、楼面强度还是容积率？",
+      "questions_to_confirm": [
+        "覆盖率或容积率",
+        "统计单元与尺度",
+        "是否允许估算楼层"
+      ],
+      "required_data": [
+        "buildings",
+        "analysis_units"
+      ],
+      "conditional_data": [
+        {
+          "when": "指标为容积率或楼面强度",
+          "data": [
+            "building_heights"
+          ],
+          "note": "以楼层/楼面面积为优先；仅有估算高度时须明示估算及转换规则。"
+        }
+      ],
+      "variants": [
+        "建筑基底覆盖率",
+        "容积率（楼面面积/用地面积）",
+        "明确标注的相对楼面强度估计"
+      ],
+      "proposed_analysis": [
+        "以原始建筑与单元相交分摊基底面积",
+        "覆盖率=基底并集面积/单元面积",
+        "容积率需楼层或楼面面积数据"
+      ],
+      "proposed_drawing": "以网格或地块分级着色，并同时输出每单元指标表。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "跨单元建筑正确分摊",
+        "覆盖率不超过100%",
+        "未知楼层不默认为实测值",
+        "图例单位与公式一致"
+      ],
+      "interpretation_boundary": "网站旧基础绘制分支可见楼层加权强度估计；最新成品算法未逐项追踪。我们应明确区分三种指标。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "pedestrian",
+      "source_number": 29,
+      "source_name": "Pedestrian Network",
+      "app_name": "Pedestrian Network",
+      "name_zh": "步行网络",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "哪些路径组成可步行空间？",
+      "questions_to_confirm": [
+        "通行人群",
+        "楼梯或坡道限制",
+        "开放时间"
+      ],
+      "required_data": [
+        "roads",
+        "pedestrian_access"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "按步行通行属性筛选",
+        "核对道路连接",
+        "标记断点和障碍"
+      ],
+      "proposed_drawing": "突出人行道、步道、广场与过街联系。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "不把不可步行道路标为步道",
+        "桥隧层级与门禁可追溯"
+      ],
+      "interpretation_boundary": "线条连接不代表实际可通行，需要入口、围墙和过街资料。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "poiheat",
+      "source_number": 30,
+      "source_name": "POI Density Heat",
+      "app_name": "POI Density Heat",
+      "name_zh": "设施密度热力",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "设施集中在什么位置？",
+      "questions_to_confirm": [
+        "设施类别",
+        "带宽或网格大小",
+        "是否按容量加权"
+      ],
+      "required_data": [
+        "pois"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "核密度估计或明确尺度网格计数",
+        "处理研究边缘效应",
+        "保留原始点位"
+      ],
+      "proposed_drawing": "连续热力面或格网热力，叠加少量背景线。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "标注带宽与单位",
+        "缺失设施不当成真实零值",
+        "加权口径可复算"
+      ],
+      "interpretation_boundary": "热力表达设施密度；不自动等于人口密度或实际活动强度。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "poitype",
+      "source_number": 31,
+      "source_name": "POI Type Map",
+      "app_name": "POI Type Map",
+      "name_zh": "设施类型图",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "周边有哪些类别的设施？",
+      "questions_to_confirm": [
+        "设施类别",
+        "重复店铺去重方式",
+        "是否标名称"
+      ],
+      "required_data": [
+        "pois"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "分类映射",
+        "位置与重复记录检查",
+        "分类型计数"
+      ],
+      "proposed_drawing": "用不同点符号或颜色展示设施类别并布局标签。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "图例覆盖所选类别",
+        "点位均可关联原始记录",
+        "图上计数与导出表一致"
+      ],
+      "interpretation_boundary": "设施存在不等于对公众开放、仍在营业或服务容量充足。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "combined",
+      "source_number": 32,
+      "source_name": "Combined Overlay",
+      "app_name": "Combined Overlay",
+      "name_zh": "综合叠加分析",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "多种场地要素叠在一起是什么关系？",
+      "questions_to_confirm": [
+        "包含哪些图层",
+        "各层视觉顺序",
+        "需要突出什么"
+      ],
+      "required_data": [
+        "roads",
+        "buildings",
+        "green_water"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "统一坐标与裁切范围",
+        "控制图层遮罩",
+        "复用已核对的分类结果"
+      ],
+      "proposed_drawing": "按前景、背景和重点分配线宽、颜色与透明度。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "各层空间对齐",
+        "遮挡不掩盖关键对象",
+        "不把视觉叠加称为综合评分"
+      ],
+      "interpretation_boundary": "它是综合表达；若要评分，必须另行定义公式与权重。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "voronoi",
+      "source_number": 33,
+      "source_name": "Service Territories",
+      "app_name": "Service Territories",
+      "name_zh": "服务范围",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "按几何最近关系，每个设施对应哪些区域？",
+      "questions_to_confirm": [
+        "设施类别",
+        "欧氏距离或路网成本",
+        "是否加服务容量"
+      ],
+      "required_data": [
+        "pois",
+        "analysis_boundary"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "欧氏距离Voronoi",
+        "另行明确的路网最近设施分区"
+      ],
+      "proposed_analysis": [
+        "用设施生成Voronoi分区",
+        "按研究范围裁切",
+        "可另设网络最近设施分区模式"
+      ],
+      "proposed_drawing": "为各设施绘制服务势力范围并标注空缺。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "无重复点导致异常区域",
+        "分区覆盖及边界可核对",
+        "距离口径在图题中明确"
+      ],
+      "interpretation_boundary": "标准Voronoi不表达绕行、门禁、营业时间或供需平衡。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "sitemap",
+      "source_number": 34,
+      "source_name": "Annotated Map",
+      "app_name": "Annotated Map",
+      "name_zh": "设施标注图",
+      "family": "base_map",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "最近或指定的设施在哪里？",
+      "questions_to_confirm": [
+        "设施类别",
+        "取最近几个",
+        "直线最近还是路程最近"
+      ],
+      "required_data": [
+        "pois",
+        "project_site"
+      ],
+      "conditional_data": [
+        {
+          "when": "按路网距离排序",
+          "data": [
+            "roads",
+            "pedestrian_access",
+            "entrances"
+          ]
+        }
+      ],
+      "variants": [
+        "按直线距离选最近设施",
+        "按真实步行成本选最近设施"
+      ],
+      "proposed_analysis": [
+        "设施筛选",
+        "按明确的距离口径排序",
+        "标签避让"
+      ],
+      "proposed_drawing": "在地图上编号设施，配名称、距离与引线。",
+      "proposed_tools": [
+        "QGIS/PyQGIS",
+        "GeoPandas",
+        "Shapely"
+      ],
+      "proposed_acceptance": [
+        "最近排序采用用户选择的口径",
+        "引线和编号一一对应"
+      ],
+      "interpretation_boundary": "直线最近与沿路网最近可能不同；没有路网时不能给真实步行时长。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "massing",
+      "source_number": 35,
+      "source_name": "Building Massing",
+      "app_name": "Building Massing",
+      "name_zh": "建筑体量",
+      "family": "projection",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "周边建筑高度、体量及某时刻阴影怎样？",
+      "questions_to_confirm": [
+        "高度来源",
+        "缺失高度是否允许估算",
+        "日期时刻及投影方式"
+      ],
+      "required_data": [
+        "buildings",
+        "building_heights"
+      ],
+      "conditional_data": [
+        {
+          "when": "显示某时刻阴影",
+          "data": [
+            "solar_dates"
+          ]
+        }
+      ],
+      "variants": [],
+      "proposed_analysis": [
+        "按真实或标记为估算的高度拉伸体块",
+        "统一地面高程",
+        "必要时计算瞬时阴影"
+      ],
+      "proposed_drawing": "体量叠加底图，按高度或重要性着色。",
+      "proposed_tools": [
+        "Three.js",
+        "地理坐标转换",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "高度单位一致",
+        "估算建筑可识别",
+        "阴影方向和日期时刻一致"
+      ],
+      "interpretation_boundary": "体块模型不包含自动准确的立面、屋顶细节或法定日照结论。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "isogrid",
+      "source_number": 36,
+      "source_name": "Isometric Massing",
+      "app_name": "Isometric Massing",
+      "name_zh": "轴测体量图",
+      "family": "projection",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "如何逐栋用轴测表达建筑体量？",
+      "questions_to_confirm": [
+        "共用城市位置或逐栋图录",
+        "高度来源",
+        "相机与夸张倍数"
+      ],
+      "required_data": [
+        "buildings",
+        "building_heights"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "拉伸建筑轮廓",
+        "采用固定轴测投影",
+        "按深度排序或遮挡"
+      ],
+      "proposed_drawing": "逐栋轴测体量、半透明叠合和统一色谱。",
+      "proposed_tools": [
+        "Three.js",
+        "地理坐标转换",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "同一比例规则可查",
+        "高度缺失有标记",
+        "投影不改变原始测量值"
+      ],
+      "interpretation_boundary": "这是体量表达形式，不能增加缺失的建筑真实性。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "typology",
+      "source_number": 37,
+      "source_name": "Building Typology",
+      "app_name": "Building Typology",
+      "name_zh": "建筑类型学图录",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "建筑轮廓的尺度和形态怎样比较？",
+      "questions_to_confirm": [
+        "建筑筛选条件",
+        "按面积或形态排序",
+        "保持同一比例或统一尺寸"
+      ],
+      "required_data": [
+        "buildings"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "同一比例排列轮廓",
+        "归一化大小比较形态（需明确声明）"
+      ],
+      "proposed_analysis": [
+        "提取有效建筑轮廓",
+        "计算面积并排序",
+        "保留原始形状与比例关系"
+      ],
+      "proposed_drawing": "把建筑轮廓排列成图录，可标面积、序号与样本数。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "统一比例或归一化方式明确",
+        "筛选阈值可查",
+        "每个轮廓能回到原建筑"
+      ],
+      "interpretation_boundary": "目录实际为轮廓图录；不据外形推断建筑年代、用途或结构。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "mappingboard",
+      "source_number": 38,
+      "source_name": "Context Mapping Board",
+      "app_name": "Context Mapping Board",
+      "name_zh": "场地拼贴图",
+      "family": "composition",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "需要怎样的多尺度地图拼贴与场地叙事？",
+      "questions_to_confirm": [
+        "地图或图像来源",
+        "尺度层级",
+        "图框布局、随机种子和重点"
+      ],
+      "required_data": [
+        "source_images",
+        "project_site",
+        "context_maps"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "对同源地图多尺度裁切",
+        "按模板或可记录种子分割版面",
+        "安排标记和标签"
+      ],
+      "proposed_drawing": "地图图集式拼贴、局部放大、对比与图形符号。",
+      "proposed_tools": [
+        "空间分析结果",
+        "SVG",
+        "排版模板",
+        "人工标注"
+      ],
+      "proposed_acceptance": [
+        "可复现布局种子",
+        "每个图框来源清楚",
+        "装饰性变形不用于精确测量"
+      ],
+      "interpretation_boundary": "上传的普通图片没有坐标时，只能先做图像拼贴；量测前需要配准。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "urbanstations",
+      "source_number": 39,
+      "source_name": "Urban Data · Nodes",
+      "app_name": "Urban Data · Nodes",
+      "name_zh": "城市数据 · 节点",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "设施与交通节点怎样作为数据关系图展示？",
+      "questions_to_confirm": [
+        "节点数据来源",
+        "大小和颜色代表什么",
+        "连线规则"
+      ],
+      "required_data": [
+        "pois",
+        "transit_stops"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "真实节点去重",
+        "按类型和统计值编码",
+        "关系规则显式化"
+      ],
+      "proposed_drawing": "以节点、标签和关系线构成数据图。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "每个点均有真实对象",
+        "连线不是虚构交通线路",
+        "视觉大小与数值映射一致"
+      ],
+      "interpretation_boundary": "这里是数据表达；节点连线与真实交通线路应分开说明。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "urbangrid",
+      "source_number": 40,
+      "source_name": "Urban Data · Grid",
+      "app_name": "Urban Data · Grid",
+      "name_zh": "城市数据 · 网格",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "每个网格内有多少设施？",
+      "questions_to_confirm": [
+        "网格边长",
+        "设施类别",
+        "计数还是密度"
+      ],
+      "required_data": [
+        "pois",
+        "analysis_boundary"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "生成固定网格",
+        "点落格统计",
+        "必要时按有效面积换算密度"
+      ],
+      "proposed_drawing": "网格颜色或高度编码数量，并保留图例。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "计数和原始点总数一致",
+        "边界点归属规则唯一",
+        "单位与网格尺度可见"
+      ],
+      "interpretation_boundary": "公开菜单说明为设施计数，不泛指所有城市数据。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "connectionfield",
+      "source_number": 41,
+      "source_name": "Street Connection Field",
+      "app_name": "Street Connection Field",
+      "name_zh": "路网关联场",
+      "family": "spatial_statistics",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 1,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "路口及其几何邻近关系怎样分布？",
+      "questions_to_confirm": [
+        "节点提取规则",
+        "邻近距离或邻居数",
+        "是否需要路口去重"
+      ],
+      "required_data": [
+        "roads"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "提取并合并真实路口",
+        "计算几何近邻关系",
+        "构建可解释的连接图形"
+      ],
+      "proposed_drawing": "画节点、邻近联系和影响场，保留地图背景。",
+      "proposed_tools": [
+        "GeoPandas",
+        "Shapely",
+        "SciPy",
+        "QGIS"
+      ],
+      "proposed_acceptance": [
+        "连接线可追溯到几何规则",
+        "桥隧不误合并",
+        "不得标成人流或交通流"
+      ],
+      "interpretation_boundary": "页面说明是路口几何邻近；不等于流量、空间句法或通行能力。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "soundmap",
+      "source_number": 42,
+      "source_name": "Sound Sources",
+      "app_name": "Sound Sources",
+      "name_zh": "声源分布图",
+      "family": "environment",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 3,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "潜在声源有哪些，分布在哪里？",
+      "questions_to_confirm": [
+        "声源类别",
+        "实测或推算",
+        "各类影响符号含义"
+      ],
+      "required_data": [
+        "noise_sources",
+        "roads",
+        "pois"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "从已有属性筛选潜在声源",
+        "按类型编码",
+        "依据明确规则绘制影响范围"
+      ],
+      "proposed_drawing": "分类声源符号与影响圈，按需配声景说明。",
+      "proposed_tools": [
+        "空间索引",
+        "数值计算",
+        "射线遮挡",
+        "专门的二维LBM实现",
+        "SVG/栅格渲染"
+      ],
+      "proposed_acceptance": [
+        "每一声源有来源",
+        "推算与实测分开标识",
+        "影响圈不冒充等声级线"
+      ],
+      "interpretation_boundary": "不能仅凭设施类别断言该处持续产生某种声级。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "contour",
+      "source_number": 43,
+      "source_name": "Topography",
+      "app_name": "Topography",
+      "name_zh": "地形等高线",
+      "family": "terrain",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "场地高程起伏和等高线怎样分布？",
+      "questions_to_confirm": [
+        "DEM/DTM来源与分辨率",
+        "高程基准",
+        "等高距"
+      ],
+      "required_data": [
+        "elevation_ground"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "核对高程和水平单位",
+        "处理空值",
+        "按指定等高距提取线并按需生成山体阴影"
+      ],
+      "proposed_drawing": "分层地形或等高线图，标注高程与数据分辨率。",
+      "proposed_tools": [
+        "GDAL",
+        "Rasterio",
+        "pysheds",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "等高线间距规则一致",
+        "高程点与原数据对照",
+        "NoData区域不被插值成虚假平地"
+      ],
+      "interpretation_boundary": "粗分辨率高程不能自动生成测绘级细节。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "aspect",
+      "source_number": 44,
+      "source_name": "Slope & Drainage",
+      "app_name": "Slope & Drainage",
+      "name_zh": "坡度与排水",
+      "family": "terrain",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "坡地朝哪里倾斜，潜在地表汇流往哪里走？",
+      "questions_to_confirm": [
+        "只看坡度坡向还是增加汇流",
+        "栅格精度",
+        "是否包含人工排水设施"
+      ],
+      "required_data": [
+        "elevation_ground"
+      ],
+      "conditional_data": [
+        {
+          "when": "要求考虑人工排水设施",
+          "data": [
+            "drainage_infrastructure"
+          ],
+          "note": "需要扩展明确的水文/水力模块；不能仅加管线就声称完成城市排水分析。"
+        }
+      ],
+      "variants": [],
+      "proposed_analysis": [
+        "计算坡度坡向",
+        "若需汇流则显式填洼处理并计算D8/D∞",
+        "保留人工构筑物的处理记录"
+      ],
+      "proposed_drawing": "坡度分区、下坡箭头，必要时单独绘制汇流线。",
+      "proposed_tools": [
+        "GDAL",
+        "Rasterio",
+        "pysheds",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "坡度单位明确",
+        "箭头与高程趋势一致",
+        "人工管网与自然汇流分层"
+      ],
+      "interpretation_boundary": "菜单基础图强调下坡方向；地表流向不等于暴雨积水或管网排水能力。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "wireframe",
+      "source_number": 45,
+      "source_name": "Terrain Wireframe",
+      "app_name": "Terrain Wireframe",
+      "name_zh": "地形线阵",
+      "family": "terrain",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "如何用地形剖面线表达真实起伏？",
+      "questions_to_confirm": [
+        "剖面方向与间距",
+        "垂直夸张倍数",
+        "地面模型是否可靠"
+      ],
+      "required_data": [
+        "elevation_ground"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "堆叠地面剖面线"
+      ],
+      "proposed_analysis": [
+        "按方向采样成多条剖面",
+        "插值时保留原分辨率说明",
+        "按真实高差和显式夸张倍数投影"
+      ],
+      "proposed_drawing": "堆叠剖面线并作前后遮挡，标注高程范围与垂直比例。",
+      "proposed_tools": [
+        "GDAL",
+        "Rasterio",
+        "pysheds",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "平坦场地仍保持平坦",
+        "垂直夸张显式标注",
+        "建筑或树冠高程不当成地面"
+      ],
+      "interpretation_boundary": "目录实际为堆叠地面剖面表达；不是必然需要完整三角网的通用3D线框。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "climtemp",
+      "source_number": 46,
+      "source_name": "Temperature Year",
+      "app_name": "Temperature Year",
+      "name_zh": "全年气温",
+      "family": "climate",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "指定时段的月气温变化是什么？",
+      "questions_to_confirm": [
+        "具体年份或多年平均",
+        "高低温的统计定义",
+        "气象站或网格来源"
+      ],
+      "required_data": [
+        "weather_temperature"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "月均日最高/最低温",
+        "月极端最高/最低温（不能与前者混用）"
+      ],
+      "proposed_analysis": [
+        "读取原始气象序列",
+        "核对缺测与温标",
+        "明确月均日最高/最低温和月极值的区别后聚合"
+      ],
+      "proposed_drawing": "月份横轴、高低温曲线或带状图，注明摄氏度和统计时段。",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "聚合公式可回算",
+        "缺测不填为0℃",
+        "高低温定义与图例一致"
+      ],
+      "interpretation_boundary": "区域气象背景不代表场地每个角落的实际温度。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "climprecip",
+      "source_number": 47,
+      "source_name": "Precipitation Year",
+      "app_name": "Precipitation Year",
+      "name_zh": "全年降水",
+      "family": "climate",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "一年中降水量如何分配？",
+      "questions_to_confirm": [
+        "年份或统计期",
+        "月累计或日均",
+        "降水单位"
+      ],
+      "required_data": [
+        "weather_precipitation"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "月累计降水",
+        "月均每日降水（需注明单位）"
+      ],
+      "proposed_analysis": [
+        "校验时间间隔和单位",
+        "按定义累计降水",
+        "记录缺测月份"
+      ],
+      "proposed_drawing": "月降水柱状图，必要时标注全年合计。",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "月值与年累计可核对",
+        "mm/day与mm/month正确换算",
+        "缺测明确显示"
+      ],
+      "interpretation_boundary": "降水总量不能单独决定排水量或内涝风险。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "climover",
+      "source_number": 48,
+      "source_name": "Annual Climate",
+      "app_name": "Annual Climate",
+      "name_zh": "年度气候",
+      "family": "climate",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "气温和降水的季节关系怎样？",
+      "questions_to_confirm": [
+        "统计时段",
+        "温度指标",
+        "双轴单位与比例"
+      ],
+      "required_data": [
+        "weather_temperature",
+        "weather_precipitation"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "复用已经校核的温度与降水月统计",
+        "统一时间轴"
+      ],
+      "proposed_drawing": "气温曲线与降水柱组合成气候图。",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "与单独温度和降水图使用相同统计结果",
+        "两轴单位清楚"
+      ],
+      "interpretation_boundary": "基础年度气候图以气温和降水为主；增加湿度或风需要额外明确指标。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "sunaxo",
+      "source_number": 49,
+      "source_name": "Sun & Wind Axonometric",
+      "app_name": "Sun & Wind Axonometric",
+      "name_zh": "日照与风环境轴测",
+      "family": "projection",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "太阳轨迹、受光立面与主导风怎样在同一轴测图表达？",
+      "questions_to_confirm": [
+        "季节和时刻",
+        "立面受光判定方式",
+        "风统计时段与相机"
+      ],
+      "required_data": [
+        "buildings",
+        "building_heights",
+        "solar_dates",
+        "weather_wind"
+      ],
+      "conditional_data": [],
+      "variants": [],
+      "proposed_analysis": [
+        "生成体块与太阳轨迹",
+        "按法向和遮挡判定瞬时向阳面",
+        "叠加统计主导风"
+      ],
+      "proposed_drawing": "轴测体块、季节太阳弧、受光面与主导风箭头。",
+      "proposed_tools": [
+        "Three.js",
+        "地理坐标转换",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "与太阳轨迹图共享天文参数",
+        "风向来向去向清楚",
+        "瞬时受光不标作累计日照"
+      ],
+      "interpretation_boundary": "当前目录已替换旧日长项；向阳立面、累计日照和风速模拟需分别说明。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    },
+    {
+      "id": "climsolar",
+      "source_number": 50,
+      "source_name": "Solar Radiation",
+      "app_name": "Solar Radiation",
+      "name_zh": "太阳辐射",
+      "family": "climate",
+      "implementation_status": "not_implemented",
+      "proposed_priority": 2,
+      "evidence": [
+        {
+          "type": "observed_menu_description",
+          "evidence_id": "ev_35db6bc7a6e07d047791a081aac824652fd5bb336043822dc672c920e5000909"
+        }
+      ],
+      "analysis_question": "区域短波太阳辐射全年如何变化？",
+      "questions_to_confirm": [
+        "统计期",
+        "MJ/m²·day或其他单位",
+        "月均每日总量或月累计"
+      ],
+      "required_data": [
+        "weather_radiation"
+      ],
+      "conditional_data": [],
+      "variants": [
+        "月均每日短波辐射",
+        "月累计短波辐射"
+      ],
+      "proposed_analysis": [
+        "获取短波辐射记录",
+        "进行量纲换算",
+        "按明确时间尺度汇总"
+      ],
+      "proposed_drawing": "月辐射曲线或柱状图，标注数据网格和单位。",
+      "proposed_tools": [
+        "气象数据接口",
+        "pandas",
+        "pvlib",
+        "SVG"
+      ],
+      "proposed_acceptance": [
+        "日均与月累计不混用",
+        "数值可追溯到原数据",
+        "区域尺度明确"
+      ],
+      "interpretation_boundary": "本目录图是气候短波辐射统计；场地遮挡后地表辐射属于另一个计算任务。",
+      "research_status": "menu_verified; full_current_algorithm_not_audited; proposed_pipeline_is_our_design"
+    }
+  ]
+}

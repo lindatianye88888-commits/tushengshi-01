@@ -1,0 +1,645 @@
+{
+  "schema_version": "0.2.0",
+  "status": "requirements_design_only",
+  "accepted_structure": {
+    "family_count": 8,
+    "diagram_count": 50,
+    "interaction": "项目共用信息 → 启用的组级任务卡 → 已选图纸的必要参数 → 汇总出图清单",
+    "decision_source": "用户认可50图归8组并在8组上做任务卡",
+    "approval_scope": "已认可分组与组级任务卡结构；具体字段和默认参数仍为设计草案。"
+  },
+  "common_card_fields": [
+    "本组分析目的（可选）",
+    "本次选中的图纸及实例",
+    "可共用的场地、数据与分析设置",
+    "按选图展开的必要参数",
+    "数据检查与允许的估算",
+    "表达和交付设置",
+    "汇总清单与验收要求"
+  ],
+  "interaction_rules": [
+    "可以从选图、描述或组选入口进入，允许同时输入。",
+    "只选一张图时自动归入相应组，不要求先选组。",
+    "只展开有选中图纸的组；推荐待采纳时保持候选状态。",
+    "选中一组不等于选中组内全部图纸。",
+    "共用设置只对语义兼容的字段生效，逐图覆盖必须可见。",
+    "资料依赖由已选实例和实际模式推导，不索要整组全部资料。",
+    "需求确认与资料齐备分开；更改共享参数只更新实际受影响实例。",
+    "后台跨组辅助计算不自动启用另一个交付组或新增成果。",
+    "每组显示选中图纸数、实例数、情景数与导出文件数的区别。",
+    "具体的逐图计算与验收继续引用diagrams.json。"
+  ],
+  "project_shared_fields": [
+    "项目位置与红线",
+    "显示范围、分析范围、取数范围",
+    "坐标、单位与北向",
+    "共用数据版本",
+    "共用风格、语言、纸张及导出格式"
+  ],
+  "groups": [
+    {
+      "group_id": "base_map",
+      "name": "底图分类与标注",
+      "supported_diagram_ids": [
+        "roads",
+        "landuse",
+        "gw",
+        "context",
+        "fabric",
+        "orient",
+        "pedestrian",
+        "poitype",
+        "combined",
+        "location",
+        "sitemap"
+      ],
+      "purpose": "共用场地底图、分类规则与标注设置，生成选中的基础地图。",
+      "shared_fields": [
+        {
+          "id": "spatial_context",
+          "label": "场地、范围与坐标",
+          "input": "继承项目设置，可明确覆盖",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "data_snapshot",
+          "label": "底图来源与版本",
+          "input": "使用已有资料或选择数据获取方式",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "classification_and_labels",
+          "label": "共用分类、重点对象与标注密度",
+          "input": "提供模板，可按图层调整",
+          "applies_to": "相关图层"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "roads"
+          ],
+          "ask": "道路分级体系，是否显示步道和道路名称。"
+        },
+        {
+          "diagram_ids": [
+            "landuse"
+          ],
+          "ask": "建筑功能或地块用地；分类体系和未知类的表达。"
+        },
+        {
+          "diagram_ids": [
+            "gw"
+          ],
+          "ask": "绿地、水体类别；若显示最近公园，确认距离口径。"
+        },
+        {
+          "diagram_ids": [
+            "fabric"
+          ],
+          "ask": "建筑筛选及覆盖率统计范围。"
+        },
+        {
+          "diagram_ids": [
+            "context",
+            "location"
+          ],
+          "ask": "区位尺度层级及背景边界。"
+        },
+        {
+          "diagram_ids": [
+            "orient"
+          ],
+          "ask": "真北、图纸北向与场地主轴。"
+        },
+        {
+          "diagram_ids": [
+            "pedestrian"
+          ],
+          "ask": "通行人群、开放条件及是否显示过街联系。"
+        },
+        {
+          "diagram_ids": [
+            "poitype",
+            "sitemap"
+          ],
+          "ask": "设施类别和标注数量；最近设施按直线或路网排序。"
+        },
+        {
+          "diagram_ids": [
+            "combined"
+          ],
+          "ask": "需要叠加的图层及视觉顺序。"
+        }
+      ],
+      "acceptance": [
+        "底图坐标、范围、北向一致或明确标注差异。",
+        "分类图例与原始属性一致，未知信息保留。",
+        "统计表、图面与汇总栏采用同一口径。"
+      ],
+      "example": "勾选道路、建筑肌理、绿地水体，三张共用红线、底图版本和灰绿风格；道路等级单独设置一次。"
+    },
+    {
+      "group_id": "spatial_statistics",
+      "name": "几何处理与空间统计",
+      "supported_diagram_ids": [
+        "connectionfield",
+        "nodes",
+        "density",
+        "poiheat",
+        "orientrose",
+        "voronoi",
+        "typology",
+        "urbanstations",
+        "urbangrid",
+        "fabricplus",
+        "vitality"
+      ],
+      "purpose": "共用原始分析几何和数据版本，按选中指标计算，按需设置统计尺度。",
+      "shared_fields": [
+        {
+          "id": "spatial_context",
+          "label": "统计对象与研究边界",
+          "input": "继承项目边界，选择参与统计的对象",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "data_snapshot",
+          "label": "属性来源、完整性与版本",
+          "input": "复用底图与设施资料",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "metric_definitions",
+          "label": "所选指标与单位",
+          "input": "显示指标解释，保留逐图口径",
+          "applies_to": "所选图纸"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "density"
+          ],
+          "ask": "覆盖率、容积率或相对强度；统计单元。仅后两者要求楼层/楼面资料。"
+        },
+        {
+          "diagram_ids": [
+            "poiheat"
+          ],
+          "ask": "设施类别；选择核密度或网格计数，再填写带宽或网格大小。"
+        },
+        {
+          "diagram_ids": [
+            "urbangrid"
+          ],
+          "ask": "网格边长、设施类别、计数或密度；可复用兼容的统计网格。"
+        },
+        {
+          "diagram_ids": [
+            "connectionfield",
+            "nodes",
+            "urbanstations"
+          ],
+          "ask": "节点类别、层级与连线含义；几何近邻与真实线路分开。"
+        },
+        {
+          "diagram_ids": [
+            "orientrose"
+          ],
+          "ask": "方向分箱、长度或条数权重、相反方向处理。"
+        },
+        {
+          "diagram_ids": [
+            "voronoi"
+          ],
+          "ask": "设施类别及欧氏或路网距离口径。"
+        },
+        {
+          "diagram_ids": [
+            "typology"
+          ],
+          "ask": "建筑筛选、排序、同一比例或归一化排列。"
+        },
+        {
+          "diagram_ids": [
+            "fabricplus"
+          ],
+          "ask": "概化比例尺、合并距离、院落阈值、简化容差。"
+        },
+        {
+          "diagram_ids": [
+            "vitality"
+          ],
+          "ask": "代理指标、权重、时间情景和校准资料；明确相对指数含义。"
+        }
+      ],
+      "acceptance": [
+        "指标定义、分母、单位、尺度与图例可追溯。",
+        "概化几何不替代原始分析几何。",
+        "未校准的活力指数不标为实测人流。"
+      ],
+      "example": "同时选建筑覆盖率与设施网格图，共用研究范围；只有用户明确采用同一网格时，两张图才共用网格。"
+    },
+    {
+      "group_id": "routing",
+      "name": "路网计算",
+      "supported_diagram_ids": [
+        "transit",
+        "access",
+        "walkroutes"
+      ],
+      "purpose": "共用可通行网络、出发条件与成本规则，生成到站、可达范围及目的地路线。",
+      "shared_fields": [
+        {
+          "id": "origin",
+          "label": "默认起点或入口",
+          "input": "地图选点或引用已核对入口；允许逐图明确覆盖",
+          "applies_to": "所选路网任务"
+        },
+        {
+          "id": "travel_profile",
+          "label": "步行人群、速度与通行限制",
+          "input": "设置步速、台阶、门禁、过街与时间条件",
+          "applies_to": "真实路网模式"
+        },
+        {
+          "id": "network_snapshot",
+          "label": "路网版本与计算范围",
+          "input": "系统检查连通与外扩取数范围",
+          "applies_to": "真实路网模式"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "transit"
+          ],
+          "ask": "站点类别、站口、最近站选择，以及只展示站点或计算实际到站时间。"
+        },
+        {
+          "diagram_ids": [
+            "access"
+          ],
+          "ask": "直线示意或真实路网等时范围；选定时间阈值。"
+        },
+        {
+          "diagram_ids": [
+            "walkroutes"
+          ],
+          "ask": "目的地、最近规则、最短距离或最少时间。"
+        }
+      ],
+      "acceptance": [
+        "选中图纸之间的相同起点与通行设置可复用。",
+        "网络计算范围足够，不被显示范围提前截断。",
+        "时距由路段成本累计；不可达明确标记。"
+      ],
+      "example": "公共交通到站时间与10分钟可达范围共用北侧入口和步行条件；前者选站口，后者只补时间阈值。"
+    },
+    {
+      "group_id": "terrain",
+      "name": "高程处理",
+      "supported_diagram_ids": [
+        "contour",
+        "aspect",
+        "wireframe"
+      ],
+      "purpose": "共用一份经核对的地面高程，为等高线、坡向/汇流与剖面表达提供基础。",
+      "shared_fields": [
+        {
+          "id": "ground_elevation",
+          "label": "高程来源、地面属性与分辨率",
+          "input": "导入或选取地面高程资料",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "reference_and_units",
+          "label": "水平/高程基准、坐标与单位",
+          "input": "核对米制单位、空值和有效范围",
+          "applies_to": "所选图纸"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "contour"
+          ],
+          "ask": "等高距、高程标注与分层设色。"
+        },
+        {
+          "diagram_ids": [
+            "aspect"
+          ],
+          "ask": "坡度单位；仅坡向还是增加汇流；人工设施如何处理。"
+        },
+        {
+          "diagram_ids": [
+            "wireframe"
+          ],
+          "ask": "剖面方向、间距、垂直夸张倍数。"
+        }
+      ],
+      "acceptance": [
+        "等高线、坡向与剖面采用同一高程基础。",
+        "不把建筑/树冠当作地面；空值可识别。",
+        "图中显示高程单位、分辨率与垂直夸张。"
+      ],
+      "example": "一份地面高程生成等高线和剖面线阵；等高距与剖面间距分别设置。"
+    },
+    {
+      "group_id": "climate",
+      "name": "气象与天文统计",
+      "supported_diagram_ids": [
+        "sun",
+        "climtemp",
+        "climprecip",
+        "climover",
+        "climsolar"
+      ],
+      "purpose": "按已选任务共用位置、合适的数据来源及兼容的统计时段。",
+      "shared_fields": [
+        {
+          "id": "location",
+          "label": "项目位置",
+          "input": "继承项目位置",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "weather_source_and_period",
+          "label": "气象来源与统计时段",
+          "input": "选择年份或多年统计；太阳轨迹单独选中时不要求气象序列",
+          "applies_to": "已选气象统计图"
+        },
+        {
+          "id": "time_reference",
+          "label": "日期与时区",
+          "input": "采用可追溯的时间基准",
+          "applies_to": "相关天文/时间计算"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "sun"
+          ],
+          "ask": "节气或具体日期、时区、时间步长。"
+        },
+        {
+          "diagram_ids": [
+            "climtemp"
+          ],
+          "ask": "月均日最高/最低温或月极端高低温。"
+        },
+        {
+          "diagram_ids": [
+            "climprecip"
+          ],
+          "ask": "月累计降水或月均每日降水。"
+        },
+        {
+          "diagram_ids": [
+            "climover"
+          ],
+          "ask": "采用的温度和降水口径，复用已核对统计结果。"
+        },
+        {
+          "diagram_ids": [
+            "climsolar"
+          ],
+          "ask": "短波辐射单位，月均每日量或月累计。"
+        }
+      ],
+      "acceptance": [
+        "气象统计的年份、月序和单位一致。",
+        "气候综合图与单项图共用相同聚合结果。",
+        "区域气象、太阳轨迹和局部遮挡受晒分别解释。"
+      ],
+      "example": "温度、降水、年度气候共用同一统计期；年度气候直接复用前两项的月统计。"
+    },
+    {
+      "group_id": "projection",
+      "name": "三维建模与投影",
+      "supported_diagram_ids": [
+        "massing",
+        "isogrid",
+        "lineaxo",
+        "sunaxo"
+      ],
+      "purpose": "共用建筑轮廓、高度与三维场景，再按不同投影和表达生成图纸。",
+      "shared_fields": [
+        {
+          "id": "building_model",
+          "label": "建筑与地面模型",
+          "input": "复用项目几何和已核对高程",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "height_policy",
+          "label": "高度来源和缺失处理",
+          "input": "区分测量、已知楼层及明确接受的估算",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "camera",
+          "label": "默认观察方向、投影与比例",
+          "input": "提供预览，可逐图明确覆盖",
+          "applies_to": "兼容的图纸"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "massing"
+          ],
+          "ask": "高度着色与是否增加瞬时阴影；显示阴影时补日期时刻。"
+        },
+        {
+          "diagram_ids": [
+            "isogrid"
+          ],
+          "ask": "共用场地位置或逐栋体量表达、透明度与比例。"
+        },
+        {
+          "diagram_ids": [
+            "lineaxo"
+          ],
+          "ask": "隐藏线策略、重点对象与边线表达。"
+        },
+        {
+          "diagram_ids": [
+            "sunaxo"
+          ],
+          "ask": "日期季节、受光面定义、主导风来源与统计时段。"
+        }
+      ],
+      "acceptance": [
+        "各图引用同一版本模型，高度与估算标记一致。",
+        "不同投影不改变原始面积和高度数值。",
+        "瞬时受光、累计日照与风场不混用。"
+      ],
+      "example": "建筑体量图和线稿轴测共用同一模型，各自选择着色或线稿表达。"
+    },
+    {
+      "group_id": "environment",
+      "name": "环境估算、模拟与视线",
+      "supported_diagram_ids": [
+        "noise",
+        "wind",
+        "soundmap",
+        "noisemap",
+        "windsim",
+        "viewcones"
+      ],
+      "purpose": "在同一组组织环境相关任务，按噪声、风或照片视线展开独立条件。",
+      "shared_fields": [
+        {
+          "id": "study_target",
+          "label": "研究对象、范围与情景",
+          "input": "注明当前研究的环境现象及情景",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "claim_level",
+          "label": "示意、估算、模拟或真实照片",
+          "input": "逐图显示可支持的结论",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "source_quality",
+          "label": "输入来源与允许的估算",
+          "input": "按当前选项检查资料",
+          "applies_to": "所选图纸"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "noise"
+          ],
+          "ask": "道路相对噪声分区规则与时段。"
+        },
+        {
+          "diagram_ids": [
+            "soundmap"
+          ],
+          "ask": "声源类别、推算依据及影响符号含义。"
+        },
+        {
+          "diagram_ids": [
+            "noisemap"
+          ],
+          "ask": "道路声源、受声位置、建筑遮挡、简化声学条件。"
+        },
+        {
+          "diagram_ids": [
+            "wind"
+          ],
+          "ask": "主导风统计期、来向/流向，明确采用示意流线。"
+        },
+        {
+          "diagram_ids": [
+            "windsim"
+          ],
+          "ask": "入流方向、网格、障碍、边界、稳定/收敛条件及量纲。"
+        },
+        {
+          "diagram_ids": [
+            "viewcones"
+          ],
+          "ask": "目标、视点、相机朝向、真实照片、遮挡与署名。"
+        }
+      ],
+      "acceptance": [
+        "只检查所选图的条件，不给照片任务索要风场参数。",
+        "示意与模拟分别标注；缺失数据不伪造观测。",
+        "数值模拟按相应模型验收，照片按位置、目标和署名核对。"
+      ],
+      "example": "只选真实街景视线展板时，展开视点与照片条件；风和声学设置保持关闭。"
+    },
+    {
+      "group_id": "composition",
+      "name": "组合图与设计解读",
+      "supported_diagram_ids": [
+        "axocallout",
+        "insetboard",
+        "zoningplan",
+        "radialnet",
+        "stayplaces",
+        "oppcon",
+        "mappingboard"
+      ],
+      "purpose": "共用已产生的图层、分析结果及表达主题，再组织组合图和设计判断。",
+      "shared_fields": [
+        {
+          "id": "story_and_focus",
+          "label": "要突出的问题、对象或设计动作",
+          "input": "可以描述目的，也可直接选择图样",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "input_results",
+          "label": "引用的底图、计算结果与方案版本",
+          "input": "系统列出实际依赖，不自动新增交付图纸",
+          "applies_to": "所选图纸"
+        },
+        {
+          "id": "layout",
+          "label": "纸张、视窗、图例与统一风格",
+          "input": "继承项目输出设置并提供布局预览",
+          "applies_to": "所选图纸"
+        }
+      ],
+      "conditional_fields": [
+        {
+          "diagram_ids": [
+            "axocallout"
+          ],
+          "ask": "重点对象与放大窗口。"
+        },
+        {
+          "diagram_ids": [
+            "insetboard"
+          ],
+          "ask": "主图和四个小图内容及比例尺。"
+        },
+        {
+          "diagram_ids": [
+            "zoningplan"
+          ],
+          "ask": "现状、法定用地或拟建方案，边界/面积与需确认的方案内容。"
+        },
+        {
+          "diagram_ids": [
+            "radialnet"
+          ],
+          "ask": "目的地、直线或真实路线、地形与距离圈含义。"
+        },
+        {
+          "diagram_ids": [
+            "stayplaces"
+          ],
+          "ask": "停留空间候选、开放性与真实步行连接。"
+        },
+        {
+          "diagram_ids": [
+            "oppcon"
+          ],
+          "ask": "事实来源、判断规则、机会/约束内容及设计师批注。"
+        },
+        {
+          "diagram_ids": [
+            "mappingboard"
+          ],
+          "ask": "地图或图像来源、尺度层级、构图和可复现随机种子。"
+        }
+      ],
+      "acceptance": [
+        "每个视窗和结论能关联实际结果或人工输入。",
+        "事实、推断与方案建议分开标识。",
+        "组合图依赖的辅助计算不增加未选中的交付图。"
+      ],
+      "example": "机会与约束图引用道路、绿水结果，并记录设计师确认的判断；后台复用数据即可，不强制另交一套基础图。"
+    }
+  ]
+}

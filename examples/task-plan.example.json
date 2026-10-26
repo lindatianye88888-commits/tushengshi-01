@@ -1,0 +1,148 @@
+{
+  "is_example": true,
+  "note": "示例，不是真实项目或已确认用户需求。没有提供真实位置、红线与数据，不能开始空间计算。",
+  "schema_version": "0.2.0",
+  "project": {
+    "name": "校园更新示例",
+    "location": null,
+    "boundary": null,
+    "source_crs": null,
+    "analysis_crs": null
+  },
+  "requirement_status": "draft",
+  "data_readiness": "not_checked",
+  "implementation_readiness": "not_implemented",
+  "input_events": [
+    {
+      "type": "explicit_selection",
+      "diagram_ids": [
+        "roads"
+      ]
+    },
+    {
+      "type": "problem_description",
+      "text": "研究北侧入口的到站步行和周边步行服务，最多三张，灰绿配色。"
+    }
+  ],
+  "shared_style": {
+    "palette": "grey_green",
+    "page": "A3",
+    "status": "example_only"
+  },
+  "diagrams": [
+    {
+      "instance_id": "roads-01",
+      "diagram_id": "roads",
+      "selection_origin": "explicit_selection",
+      "selected": true,
+      "confirmed": false,
+      "parameters": {
+        "display_radius_m": null
+      },
+      "output_formats": [
+        "svg",
+        "png",
+        "pdf"
+      ],
+      "group_id": "base_map"
+    },
+    {
+      "instance_id": "transit-01",
+      "diagram_id": "transit",
+      "selection_origin": "system_recommendation",
+      "recommendation_reason": "比较北侧入口到公共交通站口的步行时间。",
+      "selected": false,
+      "confirmed": false,
+      "parameters": {
+        "mode": "walk_to_stop"
+      },
+      "output_formats": [
+        "svg",
+        "png",
+        "pdf"
+      ],
+      "group_id": "routing",
+      "inherit_shared_fields": [
+        "origin_id",
+        "walking_speed_m_per_s",
+        "travel_profile"
+      ]
+    },
+    {
+      "instance_id": "access-01",
+      "diagram_id": "access",
+      "selection_origin": "system_recommendation",
+      "recommendation_reason": "表达北侧入口沿真实路网的步行服务范围。",
+      "selected": false,
+      "confirmed": false,
+      "parameters": {
+        "mode": "network_isochrone",
+        "thresholds_minutes": [
+          5,
+          10,
+          15
+        ]
+      },
+      "parameter_provenance": {
+        "thresholds_minutes": "suggested_default_not_confirmed"
+      },
+      "output_formats": [
+        "svg",
+        "png",
+        "pdf"
+      ],
+      "group_id": "routing",
+      "inherit_shared_fields": [
+        "origin_id",
+        "walking_speed_m_per_s",
+        "travel_profile"
+      ]
+    }
+  ],
+  "rejected_recommendations": [],
+  "coverage_notes": [
+    "底图组只启用已选道路图；路网组保持候选，推荐采纳后才启用。",
+    "共用起点与步行条件在路网组记录一次；当前未提供真实位置和通行资料。"
+  ],
+  "current_selected_diagram_count": 1,
+  "candidate_diagram_count": 3,
+  "export_file_count_policy": "以最终选中实例及格式计算，不将辅助计算或候选推荐计入最终交付。",
+  "interaction_model": "project_shared → active_group_cards → selected_diagram_parameters → output_list",
+  "group_tasks": [
+    {
+      "group_id": "base_map",
+      "active": true,
+      "status": "draft",
+      "selected_instance_ids": [
+        "roads-01"
+      ],
+      "candidate_instance_ids": [],
+      "shared_parameters": {
+        "spatial_context_ref": "project",
+        "data_snapshot_ref": null
+      },
+      "confirmed": false
+    },
+    {
+      "group_id": "routing",
+      "active": false,
+      "status": "proposed",
+      "selected_instance_ids": [],
+      "candidate_instance_ids": [
+        "transit-01",
+        "access-01"
+      ],
+      "shared_parameters": {
+        "origin_id": "north_gate",
+        "walking_speed_m_per_s": null,
+        "travel_profile": null
+      },
+      "parameter_provenance": {
+        "origin_id": "example_problem_description_not_geolocated",
+        "walking_speed_m_per_s": "unknown"
+      },
+      "confirmed": false
+    }
+  ],
+  "active_group_card_count": 1
+}

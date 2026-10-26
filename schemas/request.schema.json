@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:site-workflow:request:0.1.0",
+  "title": "AI桌面端场地分析请求",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_version": {
+      "const": "0.1.0"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "center": {
+          "type": "object",
+          "properties": {
+            "lon": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "lat": {
+              "type": "number",
+              "exclusiveMinimum": -80,
+              "exclusiveMaximum": 84
+            },
+            "crs": {
+              "const": "EPSG:4326"
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "lon",
+            "lat"
+          ],
+          "additionalProperties": false
+        },
+        "radius_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "padding_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagrams": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/diagram_id"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/diagram_id"
+              },
+              "instance_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_-]{0,79}$"
+              },
+              "parameters": {
+                "type": "object"
+              },
+              "style": {
+                "$ref": "#/$defs/style"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/diagram_id"
+          },
+          "instance_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "remove_instances": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "style": {
+      "$ref": "#/$defs/style"
+    },
+    "formats": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "svg",
+          "png",
+          "pdf"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "existing",
+            "overture"
+          ]
+        },
+        "cache": {
+          "type": "string"
+        },
+        "offline": {
+          "type": "boolean"
+        },
+        "release": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}\\.\\d+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "requirements_confirmed": {
+      "type": "boolean",
+      "default": false
+    },
+    "authorization_note": {
+      "type": "string"
+    },
+    "refresh_data": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "$defs": {
+    "diagram_id": {
+      "enum": [
+        "axocallout",
+        "insetboard",
+        "zoningplan",
+        "viewcones",
+        "lineaxo",
+        "radialnet",
+        "oppcon",
+        "stayplaces",
+        "noisemap",
+        "windsim",
+        "fabricplus",
+        "fabric",
+        "roads",
+        "landuse",
+        "gw",
+        "transit",
+        "walkroutes",
+        "noise",
+        "sun",
+        "wind",
+        "nodes",
+        "context",
+        "location",
+        "orient",
+        "orientrose",
+        "vitality",
+        "access",
+        "density",
+        "pedestrian",
+        "poiheat",
+        "poitype",
+        "combined",
+        "voronoi",
+        "sitemap",
+        "massing",
+        "isogrid",
+        "typology",
+        "mappingboard",
+        "urbanstations",
+        "urbangrid",
+        "connectionfield",
+        "soundmap",
+        "contour",
+        "aspect",
+        "wireframe",
+        "climtemp",
+        "climprecip",
+        "climover",
+        "sunaxo",
+        "climsolar"
+      ]
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "palette": {
+          "enum": [
+            "atlas",
+            "grey_green",
+            "monochrome"
+          ]
+        },
+        "page": {
+          "enum": [
+            "A3",
+            "A4"
+          ]
+        },
+        "language": {
+          "const": "zh"
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "value": {},
+        "source": {
+          "type": "string"
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "value"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "requirements_confirmed": {
+            "const": true
+          }
+        },
+        "required": [
+          "requirements_confirmed"
+        ]
+      },
+      "then": {
+        "required": [
+          "authorization_note"
+        ],
+        "properties": {
+          "authorization_note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

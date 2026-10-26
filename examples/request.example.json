@@ -1,0 +1,16 @@
+{
+  "request_version": "0.1.0",
+  "project": {
+    "name": "成都万象城周边场地分析",
+    "center": {"lon": 104.1126387, "lat": 30.6507515, "crs": "EPSG:4326", "label": "成都万象城"},
+    "radius_m": 5000
+  },
+  "diagrams": ["fabric", "roads", "landuse", "gw"],
+  "recommendations": [],
+  "remove_instances": [],
+  "style": {"palette": "atlas", "page": "A3", "language": "zh"},
+  "formats": ["svg", "png", "pdf"],
+  "data": {"mode": "overture", "offline": false},
+  "requirements_confirmed": false,
+  "authorization_note": "实际操作时记录用户已有的确认或委托；本示例不自动视为授权。"
+}

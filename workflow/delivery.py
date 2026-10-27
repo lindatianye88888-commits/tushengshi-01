@@ -49,9 +49,11 @@ def bundle(run,path,include_inputs=True):
     for source in (ROOT/"workflow").rglob("*.py"):
         entries["workflow/"+source.relative_to(ROOT/"workflow").as_posix()]=source
     for name in ("diagrams.json","group-task-cards.json","development-plan.json"): entries["catalog/"+name]=ROOT/"catalog"/name
+    for source in (ROOT/'catalog/licenses').glob('*'):
+        if source.is_file():entries['catalog/licenses/'+source.name]=source
     for name in ("requirements.txt","requirements-data.txt","WORKFLOW.md","运行工作流.cmd","运行出图.cmd"):
         entries[name]=ROOT/name
-    for name in ("implementation-v02.md","validation-v02.md","development-plan.md","validation-v03.md","validation-v04.md","reference-p2a-rea.md"):
+    for name in ("implementation-v02.md","validation-v02.md","development-plan.md","validation-v03.md","validation-v04.md","reference-p2a-rea.md","validation-v05.md","reference-p2b-rea.md"):
         source=ROOT/"docs"/name
         if source.is_file(): entries["docs/"+name]=source
     for source in (ROOT/"schemas").glob("*.json"): entries["schemas/"+source.name]=source

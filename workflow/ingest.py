@@ -13,6 +13,7 @@ from .catalog import IMPLEMENTED, dependencies
 from .providers.overture import extract
 from .spatial import context, project_geom, file_hash
 from .task import load_task, write_json, effective_parameters, unwrap, parameter, event, now
+from .points import STATION_CATEGORIES, taxonomy
 
 ROAD_CLASSES = {
     "motorway":"高速快速路", "trunk":"高速快速路", "primary":"主干道", "secondary":"次干道",
@@ -27,7 +28,8 @@ LAND_CLASSES = {
     **{key:"交通设施" for key in ("railway","transportation","parking","pedestrian","plaza","traffic_island")},
     **{key:"其他已知用地" for key in ("military","landfill","construction","brownfield","farmland","farmyard","agriculture","greenfield","orchard")}}
 KINDS = {"buildings":["building"], "roads":["segment"], "landuse":["land_use","water"],
-         "green_water":["land_use","water"], "connectors":["connector"],"context_boundaries":["division_area"]}
+         "green_water":["land_use","water"], "connectors":["connector"],"context_boundaries":["division_area"],
+         "pois":["place"],"transit_stops":["place"]}
 
 
 def normalize(kind, rows, ctx, bbox):
@@ -41,7 +43,7 @@ def normalize(kind, rows, ctx, bbox):
             continue
         geom=from_wkb(row["geometry"])
         fid=str(row["id"])
-        allowed=({"LineString","MultiLineString"} if kind=="segment" else {"Point"} if kind=="connector" else {"Polygon","MultiPolygon"})
+        allowed=({"LineString","MultiLineString"} if kind=="segment" else {"Point"} if kind in {"connector","place"} else {"Polygon","MultiPolygon"})
         if geom.is_empty or geom.geom_type not in allowed:
             changes.append({"id":fid,"action":"skip_geometry_type","type":geom.geom_type});continue
         if not geom.is_valid:
@@ -49,7 +51,7 @@ def normalize(kind, rows, ctx, bbox):
         # An antimeridian-spanning bbox may match China while its geometry is in Hawaii.
         if not geom.intersects(aoi):
             changes.append({"id":fid,"action":"skip_outside_exact_aoi"});continue
-        if kind not in {"segment","division_area","connector"}:
+        if kind not in {"segment","division_area","connector","place"}:
             geom=geom.intersection(aoi)
         if geom.is_empty or geom.geom_type not in allowed:
             changes.append({"id":fid,"action":"skip_aoi_boundary_touch"});continue
@@ -77,6 +79,8 @@ def normalize(kind, rows, ctx, bbox):
             props["map_class"]=LAND_CLASSES.get(raw_class,"其他已知用地" if raw_class!="unknown" else "未知")
         elif kind=="water":
             props["map_class"]="水域"
+        elif kind=="place":
+            props['map_class']=taxonomy(props)[2]
         elif kind=="building":
             subtype=row.get("subtype")
             uses={"residential":"居住用地","education":"公共服务","medical":"公共服务","civic":"公共服务",
@@ -86,9 +90,16 @@ def normalize(kind, rows, ctx, bbox):
     return output,changes
 
 
-def source_attributions(features):
+def source_attributions(features,places=False):
     upstream=sorted({s["dataset"] for f in features for s in f["properties"].get("sources",[])
                      if s.get("dataset") and s.get("property","")==""})
+    if places:
+        credits=['Overture Maps Foundation · Places']
+        for source in upstream:
+            license_name=('Apache-2.0' if source.lower()=='foursquare' else 'CC0-1.0' if source.lower()=='alltheplaces' else
+                          'CDLA-Permissive-2.0' if source.lower() in {'meta','microsoft','pinmeto','krick','renderseo','dac','brightquery','birdeye','uberall','opentravel','opentravel alliance'} else 'see source license')
+            credits.append(f'{source} · {license_name}')
+        return upstream,credits
     credits=["© OpenStreetMap contributors, Overture Maps Foundation"]
     if "doi:10.5281/zenodo.8174931" in upstream:
         credits.append("Qian Shi et al. (2023), doi:10.5281/zenodo.8174931, CC BY 4.0")
@@ -118,8 +129,8 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
     for kind in kinds:
         try:
             rich=kind=="segment" and any(i["diagram_id"] in {"pedestrian","connectionfield"} for i in selected)
-            table,meta=extract(cache,kind,bbox,release=release,offline=offline,progress=progress,
-                               **({"required_columns":["connectors","access_restrictions"]} if rich else {}))
+            required_columns=['connectors','access_restrictions'] if rich else ['taxonomy','confidence','operating_status'] if kind=='place' else []
+            table,meta=extract(cache,kind,bbox,release=release,offline=offline,progress=progress,required_columns=required_columns)
             release=meta["release"]  # Pin every type in this snapshot to the first resolved release.
             features[kind],cleaning=normalize(kind,table.to_pylist(),ctx,bbox)
             sources[kind]={**meta,"columns":list(getattr(table,"column_names",[]))}
@@ -130,7 +141,9 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
     updated=[]
     for rid in sorted(required):
         if any(kind in errors for kind in KINDS[rid]): continue
-        if rid=="green_water":
+        if rid=='transit_stops':
+            records=[f for f in features['place'] if taxonomy(f['properties'])[0] in STATION_CATEGORIES]
+        elif rid=="green_water":
             green=[{**f,"properties":{**f["properties"],"kind":"green"}} for f in features["land_use"] if f["properties"]["map_class"]=="绿地休闲"]
             water=[{**f,"properties":{**f["properties"],"kind":"water"}} for f in features["water"]]
             records=green+water
@@ -141,10 +154,11 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
             errors[rid]="跨图层发现重复来源ID，停止写入该资源。";continue
         path=folder/f"{rid}.geojson"
         write_json(path,{"type":"FeatureCollection","features":records})
-        upstream,credits=source_attributions(records)
+        is_place=rid in {'pois','transit_stops'}
+        upstream,credits=source_attributions(records,places=is_place)
         task.setdefault("datasets",{})[rid]={
             "path":str(path.relative_to(task_path.parent)),"source":"Overture Maps Foundation",
-            "source_url":"https://docs.overturemaps.org/attribution/","license":"ODbL-1.0",
+            "source_url":"https://docs.overturemaps.org/attribution/","license":"CDLA-Permissive-2.0 / Apache-2.0 / CC0-1.0; see source records" if is_place else "ODbL-1.0",
             "acquired_at":now(),"data_period":f"Overture {release}；各对象原始更新时间不同",
             "release":release,"crs":ctx.crs.to_string(),"original_crs":"EPSG:4326","units":"metres",
             "coverage":mapping(ctx.scopes["acquisition"]),"query_bbox_wgs84":bbox,"completeness":"source_complete",
@@ -153,6 +167,11 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
             "sha256":file_hash(path),"geometry_note":"可能包含遥感屋顶投影，非测绘实测基底。" if rid=="buildings" else "",
             "completeness_definition":"仅指指定来源内区域提取完成，不表示现实对象全部收录。"}
         if rid=="roads": task["datasets"][rid]["transport_fields"]=sources["segment"]["columns"]
+        if is_place:
+            task['datasets'][rid].update(category_model='taxonomy/basic_category',
+                geometry_note='来源设施点及分类未经现场核实；运营状态不是当前时刻营业状态。',
+                license_notices=['catalog/licenses/CDLA-Permissive-2.0.txt','catalog/licenses/Apache-2.0.txt','catalog/licenses/Foursquare-NOTICE.txt','catalog/licenses/CC0-1.0.txt'])
+        if rid=='transit_stops':task['datasets'][rid]['station_scope']='仅place中主分类明确为站点的记录，不含完整运营站点或线路清单。'
         updated.append(rid)
     # Only suggest missing adapter parameters. Explicit choices are retained.
     for item in selected:

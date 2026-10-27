@@ -75,7 +75,7 @@
     {
       "id": "P2B",
       "target_version": "0.5.0",
-      "status": "planned",
+      "status": "local_validated",
       "diagrams": [
         {
           "id": "poitype",
@@ -107,7 +107,9 @@
         }
       ],
       "new_count": 7,
-      "target_total": 21
+      "target_total": 21,
+      "validation_report": "docs/validation-v05.md",
+      "reference_review": "docs/reference-p2b-rea.md"
     },
     {
       "id": "P3",
@@ -280,7 +282,7 @@
       "target_total": 50
     }
   ],
-  "last_verified_version": "0.4.0",
-  "implemented_count": 14,
-  "remaining_count": 36
+  "last_verified_version": "0.5.0",
+  "implemented_count": 21,
+  "remaining_count": 29
 }

@@ -177,7 +177,8 @@ def extract(cache, kind, bbox, *, release=None, offline=False, progress=None, re
                         raise ValueError(f"来源缺少必要字段：{sorted(set(required_columns)-set(schema.names))}")
                     columns=[key for key in ("id","geometry","bbox","names","sources","class","subtype","has_parts","height","num_floors","level",
                               "connectors","access_restrictions","prohibited_transitions","road_flags","level_rules",
-                              "division_id","country","region","admin_level","is_land","is_territorial") if key in schema.names]
+                              "division_id","country","region","admin_level","is_land","is_territorial",
+                              "basic_category","taxonomy","confidence","operating_status") if key in schema.names]
                     handle.seek(0)
                     table=pq.read_table(handle,columns=columns,filters=bbox_filter(pc,bbox),use_threads=False,pre_buffer=False)
                 tables.append(table);sources.append(asset[provider]["href"])

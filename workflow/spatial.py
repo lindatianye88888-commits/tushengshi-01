@@ -111,7 +111,7 @@ def load_dataset(resource_id, spec, base_dir, ctx):
             raise ValueError(f"{resource_id} 文件 CRS 声明与资料元数据不一致。")
     features, ids = [], set()
     allowed = ({"LineString", "MultiLineString"} if resource_id == "roads" else
-               {"Point"} if resource_id == "connectors" else {"Polygon", "MultiPolygon"})
+               {"Point"} if resource_id in {"connectors","pois","transit_stops"} else {"Polygon", "MultiPolygon"})
     for feature in data["features"]:
         fid = feature.get("id")
         if not isinstance(fid, (str, int)) or str(fid) in ids:

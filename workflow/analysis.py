@@ -9,6 +9,10 @@ PATH_CLASSES = {"footway", "path", "pedestrian", "steps", "cycleway", "bridleway
 
 
 def algorithm_version(did):
+    from .catalog import POINT_DIAGRAMS
+    if did in POINT_DIAGRAMS:
+        from .points import POINTS_VERSION
+        return POINTS_VERSION
     from .cartography import CARTOGRAPHIC_DIAGRAMS, CARTOGRAPHY_VERSION
     if did in CARTOGRAPHIC_DIAGRAMS:
         return CARTOGRAPHY_VERSION
@@ -17,6 +21,10 @@ def algorithm_version(did):
 
 
 def analyze_resources(did, parameters, resources, ctx, project):
+    from .catalog import POINT_DIAGRAMS
+    if did in POINT_DIAGRAMS:
+        from .points import analyze_points
+        return analyze_points(did,parameters,resources,ctx,project)
     from .cartography import CARTOGRAPHIC_DIAGRAMS, analyze_cartography
     if did in CARTOGRAPHIC_DIAGRAMS:
         return analyze_cartography(did, parameters, resources, ctx, project)

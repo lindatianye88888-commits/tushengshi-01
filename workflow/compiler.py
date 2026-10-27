@@ -1,4 +1,4 @@
-from .catalog import DIAGRAMS, FORMATS, IMPLEMENTED, IMPLEMENTATION_SCOPE, DEFAULTS, dependencies
+from .catalog import DIAGRAMS, FORMATS, IMPLEMENTED, IMPLEMENTATION_SCOPE, DEFAULTS, POINT_DIAGRAMS, dependencies
 from .task import load_task, effective_parameters, unwrap, active_cards, is_confirmed
 from .spatial import context, load_dataset
 from .styles import effective_style, validate_style
@@ -44,6 +44,12 @@ def prepare(task_path):
         if not implemented:
             blockers.append("该图类尚未实现；保留需求，不执行替代算法。")
         else:
+            if did in POINT_DIAGRAMS:
+                from .points import validate_parameters as validate_points
+                try:
+                    validate_points(did,params,ctx)
+                except ValueError as exc:
+                    blockers.append(str(exc))
             from .statistics import STATISTICAL_DIAGRAMS, validate_parameters
             if did in STATISTICAL_DIAGRAMS:
                 try:
@@ -97,7 +103,7 @@ def prepare(task_path):
                 warnings.append(f"{rid} 仅代表数据源已收录对象，现实完整性未核实；地图空白不等于现实空地。")
         if not implemented:
             warnings.append("依赖列表仅为目录基础依赖；模式相关的完整检查尚未实现。")
-        elif did in {"density","orientrose","typology","context","location","orient","pedestrian","combined","fabricplus","connectionfield"}:
+        elif did in IMPLEMENTATION_SCOPE:
             warnings.append("当前实现范围："+IMPLEMENTATION_SCOPE[did])
         blockers.extend(data_errors)
         instances.append({"instance_id": iid, "diagram_id": did, "name": DIAGRAMS[did]["name_zh"],

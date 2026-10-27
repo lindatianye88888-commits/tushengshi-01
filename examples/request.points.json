@@ -1,0 +1,23 @@
+{
+  "request_version": "0.1.0",
+  "project": {
+    "name": "成都万象城5km设施与节点示例",
+    "center": {"lon": 104.1126387, "lat": 30.6507515, "crs": "EPSG:4326", "label": "成都万象城"},
+    "radius_m": 5000,
+    "padding_m": 10000
+  },
+  "diagrams": [
+    {"id": "poitype", "parameters": {"mode": "source_categories", "min_confidence": 0.5}},
+    {"id": "sitemap", "parameters": {"mode": "nearest_index", "categories": ["education", "health_care"], "max_labels": 12}},
+    {"id": "poiheat", "parameters": {"mode": "gaussian_kde", "cell_size_m": 100, "bandwidth_m": 150, "truncate_sigma": 3}},
+    {"id": "voronoi", "parameters": {"mode": "euclidean_partition", "categories": ["hospital"], "max_sites": 10000}},
+    {"id": "urbangrid", "parameters": {"mode": "point_count", "cell_size_m": 250}},
+    {"id": "urbanstations", "parameters": {"mode": "source_stations", "radius_m": 300}},
+    {"id": "nodes", "parameters": {"mode": "local_concentration", "radius_m": 300, "min_separation_m": 500, "max_nodes": 12}}
+  ],
+  "style": {"palette": "atlas", "page": "A3", "language": "zh"},
+  "formats": ["svg", "png"],
+  "data": {"mode": "overture", "offline": false},
+  "requirements_confirmed": false,
+  "authorization_note": "按实际项目记录用户已有的确认或委托；本示例不自动确认。"
+}

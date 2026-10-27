@@ -15,6 +15,8 @@ GROUPS = read_json(ROOT / "catalog/group-task-cards.json")["groups"]
 # Capabilities belong to this implementation, separate from the research snapshot.
 IMPLEMENTED = {"roads", "landuse", "gw", "fabric", "density", "orientrose", "typology"}
 IMPLEMENTED.update({"context","location","orient","pedestrian","combined","fabricplus","connectionfield"})
+POINT_DIAGRAMS = {"poitype","sitemap","poiheat","voronoi","urbangrid","urbanstations","nodes"}
+IMPLEMENTED.update(POINT_DIAGRAMS)
 IMPLEMENTATION_SCOPE = {
     "roads": "按来源等级绘制中心线并统计长度，不构建通行网络。",
     "landuse": "地块用地或建筑功能属性分类；未知保留未知。",
@@ -30,6 +32,13 @@ IMPLEMENTATION_SCOPE = {
     "combined": "layer_overlay；对齐并叠加所选原始图层，不生成综合评分。",
     "fabricplus": "road_water_barriers；道路水面隔断下的轮廓概化，仅用于表达；尚无街名标注。",
     "connectionfield": "source_connectors；按来源连接点识别路口、绘制几何近邻，不推断流量。",
+    "poitype": "source_categories；来源taxonomy分类及保守去重，不保证现实设施齐全。",
+    "sitemap": "nearest_index；按项目点直线距离选取设施，名称/编号索引，不是步行距离。",
+    "poiheat": "gaussian_kde；带取数缓冲的截断高斯核密度，单位来源记录/km²，不是人流热力。",
+    "voronoi": "euclidean_partition；包含取数缓冲内竞争点的最近点分区，共址设施共用一格；边缘未保证区域单列，不判定服务缺口。",
+    "urbangrid": "point_count；固定米制网格点数及有效面积密度，保留零格。",
+    "urbanstations": "source_stations；来源明确站点与设施背景，统计周边设施，不推断线路、客流或站点重要性。",
+    "nodes": "local_concentration；按周边设施记录数和最小间距选点，项目联系线为直线，不表示城市主轴或路网中心性。",
 }
 FORMATS = {"svg", "png", "pdf"}
 DEFAULTS = {
@@ -52,9 +61,21 @@ DEFAULTS = {
                    "road_clearance_m":3.0,"preserve_holes_m2":200.0,"protect_water":True},
     "connectionfield": {"mode":"source_connectors","k_nearest":3,"max_distance_m":250.0,"max_nodes":10000},
 }
+_POINT_FILTERS = {"categories":[],"min_confidence":0.5,"unknown_confidence":"include","deduplicate":True,"exclude_permanently_closed":True}
+DEFAULTS.update({
+    "poitype": {**_POINT_FILTERS,"mode":"source_categories"},
+    "sitemap": {**_POINT_FILTERS,"mode":"nearest_index","max_labels":12},
+    "poiheat": {**_POINT_FILTERS,"mode":"gaussian_kde","cell_size_m":100.0,"bandwidth_m":150.0,"truncate_sigma":3.0},
+    "voronoi": {**_POINT_FILTERS,"mode":"euclidean_partition","max_sites":10000},
+    "urbangrid": {**_POINT_FILTERS,"mode":"point_count","cell_size_m":250.0},
+    "urbanstations": {**_POINT_FILTERS,"mode":"source_stations","radius_m":300.0},
+    "nodes": {**_POINT_FILTERS,"mode":"local_concentration","radius_m":300.0,"min_separation_m":500.0,"max_nodes":12},
+})
 
 
 def dependencies(diagram_id, parameters):
+    if diagram_id in POINT_DIAGRAMS:
+        return ["pois","transit_stops"] if diagram_id=="urbanstations" else ["pois"]
     if diagram_id=="context": return ["context_boundaries","roads"]
     if diagram_id=="location": return ["context_boundaries"]
     if diagram_id=="orient": return []

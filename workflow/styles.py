@@ -10,7 +10,9 @@ ROAD_WIDTHS={"高速快速路":1.8,"主干道":1.35,"次干道":.85,"支路街�
 TITLES={"fabric":"建筑城市肌理","roads":"路网与街道","landuse":"用地功能分布","gw":"绿地与水体",
         "density":"建筑轮廓覆盖率","orientrose":"街道方向玫瑰图","typology":"建筑轮廓类型学图录",
         "context":"城市区位","location":"多级行政区位","orient":"真北与方位参考","pedestrian":"步行通行属性底图",
-        "combined":"综合图层叠加","fabricplus":"城市肌理概化","connectionfield":"路口几何关联场"}
+        "combined":"综合图层叠加","fabricplus":"城市肌理概化","connectionfield":"路口几何关联场",
+        "poitype":"设施来源类型","sitemap":"周边设施标注索引","poiheat":"设施来源记录核密度","voronoi":"设施欧氏最近分区",
+        "urbangrid":"设施点数网格","urbanstations":"站点与周边设施","nodes":"设施集中度节点"}
 
 
 def effective_style(task,item):
@@ -28,6 +30,9 @@ def validate_style(style):
 
 
 def diagram_colors(result,style):
+    if result.get('point_kind'):
+        from .points_render import point_colors
+        return point_colors(result,style)
     if result.get('cartographic_kind'):
         colors=dict(result['legend_colors'])
         if style.get('palette')=='monochrome':

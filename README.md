@@ -64,6 +64,7 @@ v0.5新增设施来源分类、最近设施名称/编号索引、高斯核密度
 - [选图与需求说明如何共同形成任务](docs/workflow-spec.md)
 - [机器可读图纸目录](catalog/diagrams.json)
 - [7项扩展研究规格](catalog/deep-analysis.json)
+- [Lab七项研究：REA图面核对、运行问题与开发对应](docs/lab-diagrams-rea.md)
 - [三维、概念、流线与平剖等其他工具范围](docs/product-scope.md)
 - [网站证据、变更与尚未验证的部分](docs/research-evidence.md)
 - [出图任务配置示例](examples/task-plan.example.json)

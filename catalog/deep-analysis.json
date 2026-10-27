@@ -4,7 +4,13 @@
   "status": "requirements_design_only",
   "not_in_base_diagram_count": true,
   "module_count": 7,
-  "interpretation": "7项是研究模块，可能生成多种图纸、指标或动画；本轮仅核对公开说明，未逐项实测。",
+  "interpretation": "7项是研究模块，可能生成多种图纸、指标或动画；2026-10-27已通过REA进入全部七项公开Paris样例并核对主要图面，运行成功范围与问题见独立观察记录；本项目七项仍全部未实现。",
+  "reference_review": {
+    "date": "2026-10-27",
+    "method": "REA controlled browser observation of the public Paris sample",
+    "report": "docs/lab-diagrams-rea.md",
+    "boundary": "图面和参数观察不等于内部算法验证；加载占位和报错不算成功出图，未测试付费自定义场地或下载文件。"
+  },
   "source_urls": [
     "https://maptonap.com/",
     "https://maptonap.com/architecture-site-analysis/",

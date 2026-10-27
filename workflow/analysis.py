@@ -9,8 +9,18 @@ PATH_CLASSES = {"footway", "path", "pedestrian", "steps", "cycleway", "bridleway
 
 
 def algorithm_version(did):
+    from .cartography import CARTOGRAPHIC_DIAGRAMS, CARTOGRAPHY_VERSION
+    if did in CARTOGRAPHIC_DIAGRAMS:
+        return CARTOGRAPHY_VERSION
     from .statistics import STATISTICAL_DIAGRAMS, STATISTICS_VERSION
     return STATISTICS_VERSION if did in STATISTICAL_DIAGRAMS else ALGORITHM_VERSION
+
+
+def analyze_resources(did, parameters, resources, ctx, project):
+    from .cartography import CARTOGRAPHIC_DIAGRAMS, analyze_cartography
+    if did in CARTOGRAPHIC_DIAGRAMS:
+        return analyze_cartography(did, parameters, resources, ctx, project)
+    return analyze(did, parameters, next(iter(resources.values())), ctx)
 
 
 def classify(properties, parameters, did):

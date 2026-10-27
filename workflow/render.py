@@ -12,7 +12,7 @@ from pyproj import Transformer
 from .catalog import DIAGRAMS
 from .styles import PALETTES, ROAD_WIDTHS, TITLES, diagram_colors, effective_style, validate_style
 
-RENDER_VERSION = "site-atlas-0.3.0"
+RENDER_VERSION = "site-atlas-0.4.0"
 
 
 def font_setup():
@@ -126,7 +126,10 @@ def credits(result):
 
 
 def draw_result(ax, result, project, parameters, colors, compact=False):
-    if result.get("display_kind"):
+    if result.get("cartographic_kind"):
+        from .cartography_render import draw_panel
+        draw_panel(ax,result,project,parameters,colors,compact)
+    elif result.get("display_kind"):
         from .statistics_render import draw_panel
         draw_panel(ax, result, project, parameters, colors, compact)
     else:
@@ -174,7 +177,10 @@ def export(result, task, item, output_dir):
             ax = fig.add_axes([.045, .19, .66, .62])
             draw_result(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, colors)
             side = fig.add_axes([.745, .19, .21, .62])
-            if result.get("display_kind"):
+            if result.get("cartographic_kind"):
+                from .cartography_render import draw_summary
+                draw_summary(side,result,colors)
+            elif result.get("display_kind"):
                 from .statistics_render import draw_summary
                 draw_summary(side, result, colors)
             else:
@@ -184,6 +190,8 @@ def export(result, task, item, output_dir):
             notes = [f"坐标 {result['analysis_crs']} | 实线：显示范围；虚线（不同时）：统计范围 | 真北 N", f"来源：{source['source']} | 时段：{source['data_period']} | 获取：{source['acquired_at']}", f"方法：{result['method']}", f"数据 {result['data_sha256'][:12]} | 算法 {result['algorithm_version']} | {boundary}"]
             if result.get("display_kind") in {"orientation_rose", "typology_catalog"}:
                 notes[0] = f"原始分析坐标 {result['analysis_crs']} | "+("方位以场地中心真北为0°；扇区数据见CSV。" if result["display_kind"]=="orientation_rose" else "所有轮廓卡片保持同一米制比例；完整来源ID与原坐标保留在明细及分析记录。")
+            if result.get('cartographic_kind'):
+                notes[0]=f"分析投影 {result['analysis_crs']} | "+('各行政视窗独立采用投影近似比例；标记为同一项目点。' if result['cartographic_kind'] in {'context','location'} else '方法及支持模式见任务卡；不由图形推断缺失的现实属性。')
             for n,note in enumerate(notes):
                 fig.text(.045, .139-n*.023, wrapped(note, 160), size=7, color="#667168", va="top")
             attribution = "; ".join(credits(result))
@@ -219,7 +227,10 @@ def contact_board(task, items, results, path):
                 result = results[item["instance_id"]]
                 draw_result(ax, result, task["project"], {k:v["value"] for k,v in item["parameters"].items()}, diagram_colors(result, effective_style(task, item)), compact=True)
                 fig.text(left+.465/columns, bottom+.03, TITLES.get(item["diagram_id"], item["name"]), ha="center", size=13, color="#34584b", weight="bold")
-                if result.get("display_kind"):
+                if result.get("cartographic_kind"):
+                    from .cartography_render import summary_text
+                    note=summary_text(result)
+                elif result.get("display_kind"):
                     from .statistics_render import summary_text
                     note = summary_text(result)
                 else:

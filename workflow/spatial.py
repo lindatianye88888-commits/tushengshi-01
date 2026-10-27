@@ -110,7 +110,8 @@ def load_dataset(resource_id, spec, base_dir, ctx):
         if not embedded or not CRS.from_user_input(embedded).equals(crs):
             raise ValueError(f"{resource_id} 文件 CRS 声明与资料元数据不一致。")
     features, ids = [], set()
-    allowed = {"LineString", "MultiLineString"} if resource_id == "roads" else {"Polygon", "MultiPolygon"}
+    allowed = ({"LineString", "MultiLineString"} if resource_id == "roads" else
+               {"Point"} if resource_id == "connectors" else {"Polygon", "MultiPolygon"})
     for feature in data["features"]:
         fid = feature.get("id")
         if not isinstance(fid, (str, int)) or str(fid) in ids:
@@ -122,7 +123,8 @@ def load_dataset(resource_id, spec, base_dir, ctx):
         if geom.has_z:
             raise ValueError(f"{resource_id}/{fid} 首版只接受二维分析几何。")
         try:
-            geom = project_geom(geom, crs, ctx.crs)
+            if not crs.equals(ctx.crs):
+                geom = project_geom(geom, crs, ctx.crs)
         except ValueError as exc:
             raise ValueError(f"{resource_id}/{fid}: {exc}") from exc
         props = feature.get("properties") or {}

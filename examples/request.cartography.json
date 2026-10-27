@@ -1,0 +1,22 @@
+{
+  "request_version": "0.1.0",
+  "project": {
+    "name": "成都万象城5km区位与图层表达示例",
+    "center": {"lon": 104.1126387, "lat": 30.6507515, "crs": "EPSG:4326", "label": "成都万象城"},
+    "radius_m": 5000
+  },
+  "diagrams": [
+    {"id": "context", "parameters": {"mode": "administrative_context", "boundary_subtype": "county"}},
+    {"id": "location", "parameters": {"mode": "nested_boundaries", "boundary_subtypes": ["region", "county", "localadmin"]}},
+    {"id": "orient", "parameters": {"mode": "true_north", "axis_bearing_deg": null, "axis_source": null}},
+    {"id": "pedestrian", "parameters": {"mode": "source_access", "include_steps": true}},
+    {"id": "combined", "parameters": {"mode": "layer_overlay", "layers": ["green_water", "roads", "buildings"]}},
+    {"id": "fabricplus", "parameters": {"mode": "road_water_barriers", "merge_distance_m": 10, "simplify_m": 1, "road_clearance_m": 3, "preserve_holes_m2": 200, "protect_water": true}},
+    {"id": "connectionfield", "parameters": {"mode": "source_connectors", "k_nearest": 3, "max_distance_m": 250, "max_nodes": 10000}}
+  ],
+  "style": {"palette": "atlas", "page": "A3", "language": "zh"},
+  "formats": ["svg", "png"],
+  "data": {"mode": "overture", "offline": false},
+  "requirements_confirmed": false,
+  "authorization_note": "按实际项目记录用户已有的确认或委托；本示例不自动确认。"
+}

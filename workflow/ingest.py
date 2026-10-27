@@ -27,7 +27,7 @@ LAND_CLASSES = {
     **{key:"交通设施" for key in ("railway","transportation","parking","pedestrian","plaza","traffic_island")},
     **{key:"其他已知用地" for key in ("military","landfill","construction","brownfield","farmland","farmyard","agriculture","greenfield","orchard")}}
 KINDS = {"buildings":["building"], "roads":["segment"], "landuse":["land_use","water"],
-         "green_water":["land_use","water"]}
+         "green_water":["land_use","water"], "connectors":["connector"],"context_boundaries":["division_area"]}
 
 
 def normalize(kind, rows, ctx, bbox):
@@ -35,11 +35,13 @@ def normalize(kind, rows, ctx, bbox):
     aoi=box(*bbox)
     project=Transformer.from_crs(4326,ctx.crs,always_xy=True).transform
     for row in rows:
+        if kind=="division_area" and (row.get("subtype") not in {"region","county","locality","localadmin","borough"} or not (row.get("is_land") or row.get("class")=="land")):
+            continue
         if kind=="segment" and row.get("subtype")!="road":
             continue
         geom=from_wkb(row["geometry"])
         fid=str(row["id"])
-        allowed={"LineString","MultiLineString"} if kind=="segment" else {"Polygon","MultiPolygon"}
+        allowed=({"LineString","MultiLineString"} if kind=="segment" else {"Point"} if kind=="connector" else {"Polygon","MultiPolygon"})
         if geom.is_empty or geom.geom_type not in allowed:
             changes.append({"id":fid,"action":"skip_geometry_type","type":geom.geom_type});continue
         if not geom.is_valid:
@@ -47,7 +49,8 @@ def normalize(kind, rows, ctx, bbox):
         # An antimeridian-spanning bbox may match China while its geometry is in Hawaii.
         if not geom.intersects(aoi):
             changes.append({"id":fid,"action":"skip_outside_exact_aoi"});continue
-        geom=geom.intersection(aoi)
+        if kind not in {"segment","division_area","connector"}:
+            geom=geom.intersection(aoi)
         if geom.is_empty or geom.geom_type not in allowed:
             changes.append({"id":fid,"action":"skip_aoi_boundary_touch"});continue
         geom=transform(project,geom)
@@ -61,10 +64,14 @@ def normalize(kind, rows, ctx, bbox):
             changes.append({"id":fid,"action":"skip_invalid_after_projection"});continue
         # Keep source attributes and identity; analysis and drawing use derived geometry.
         props={key:value for key,value in row.items() if key not in {"id","geometry"} and value is not None}
-        props["name"]=(row.get("names") or {}).get("primary","")
+        names=row.get("names") or {};common=names.get("common") or {}
+        if not isinstance(common,dict): common=dict(common)
+        props["name"]=common.get("zh") or common.get("zh-Hans") or names.get("primary","")
         raw_class=row.get("class") or "unknown"
         if kind=="segment":
-            props["highway"]=raw_class;props["layer"]=str(row.get("level") or "0")
+            props["highway"]=raw_class;props["layer"]=str(row["level"]) if row.get("level") is not None else "unknown"
+            if "access_restrictions" in row: props["access_restrictions"]=row.get("access_restrictions") or []
+            if "connectors" in row: props["connectors"]=row.get("connectors") or []
             props["map_class"]=ROAD_CLASSES.get(raw_class.removesuffix("_link"),"未知")
         elif kind=="land_use":
             props["map_class"]=LAND_CLASSES.get(raw_class,"其他已知用地" if raw_class!="unknown" else "未知")
@@ -102,17 +109,20 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
     for item in selected:
         params={key:unwrap(value) for key,value in effective_parameters(task,item).items()}
         required.update(dependencies(item["diagram_id"],params))
-    if not required: raise ValueError("请先选中至少一张已实现的图纸，再获取资料。")
+    if not required:
+        return {"updated_resources":[],"errors":{},"note":"已选图纸仅依赖任务配置，无需外部取数。"}
     kinds=sorted({kind for rid in required for kind in KINDS[rid]})
     snapshot=datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")+"-"+uuid.uuid4().hex[:8]
     folder=task_path.parent/"data/snapshots"/snapshot;folder.mkdir(parents=True)
     features,errors,sources={}, {}, {}
     for kind in kinds:
         try:
-            table,meta=extract(cache,kind,bbox,release=release,offline=offline,progress=progress)
+            rich=kind=="segment" and any(i["diagram_id"] in {"pedestrian","connectionfield"} for i in selected)
+            table,meta=extract(cache,kind,bbox,release=release,offline=offline,progress=progress,
+                               **({"required_columns":["connectors","access_restrictions"]} if rich else {}))
             release=meta["release"]  # Pin every type in this snapshot to the first resolved release.
             features[kind],cleaning=normalize(kind,table.to_pylist(),ctx,bbox)
-            sources[kind]=meta
+            sources[kind]={**meta,"columns":list(getattr(table,"column_names",[]))}
             write_json(folder/f"{kind}-cleaning.json",cleaning)
             progress(f"{kind}：保留 {len(features[kind]):,} 个对象；处理记录 {len(cleaning)} 条")
         except (ValueError,OSError,RuntimeError) as exc:
@@ -142,6 +152,7 @@ def fetch_task(task_path, cache, *, offline=False, release=None, progress=None):
             "attributions":credits,"upstream_datasets":upstream,"snapshot_id":snapshot,
             "sha256":file_hash(path),"geometry_note":"可能包含遥感屋顶投影，非测绘实测基底。" if rid=="buildings" else "",
             "completeness_definition":"仅指指定来源内区域提取完成，不表示现实对象全部收录。"}
+        if rid=="roads": task["datasets"][rid]["transport_fields"]=sources["segment"]["columns"]
         updated.append(rid)
     # Only suggest missing adapter parameters. Explicit choices are retained.
     for item in selected:

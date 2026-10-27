@@ -59,13 +59,35 @@ class RangeFile(io.RawIOBase):
         if size < 0: size = self.size-self.position
         size = min(size, self.size-self.position)
         if size <= 0: return b""
-        if size > 80_000_000 or self.transferred+size > 350_000_000:
+        if size > 80_000_000:
             raise ValueError("本次区域查询超过分块读取预算，请缩小范围。")
-        start, end = self.position, self.position+size-1
+        start,end=self.position,self.position+size-1
+        exact=self.cache/f"{start}-{end}.bin"
+        if exact.exists() and exact.stat().st_size==size:
+            data=exact.read_bytes()
+        elif size<=262144:
+            # Nested Parquet fields issue many adjacent tiny reads. Cache aligned
+            # 1MiB blocks while returning exactly the originally requested bytes.
+            block=1048576;pieces=[];cursor=start
+            while cursor<=end:
+                block_start=cursor//block*block;block_end=min(block_start+block-1,self.size-1)
+                raw=self._range(block_start,block_end)
+                take=min(end,block_end)-cursor+1
+                pieces.append(raw[cursor-block_start:cursor-block_start+take]);cursor+=take
+            data=b''.join(pieces)
+        else:
+            data=self._range(start,end)
+        self.position+=size
+        return data
+
+    def _range(self,start,end):
+        size=end-start+1
         target = self.cache/f"{start}-{end}.bin"
         if target.exists() and target.stat().st_size==size:
             data = target.read_bytes()
         else:
+            if self.transferred+size>350_000_000:
+                raise ValueError("本次区域查询超过分块读取预算，请缩小范围。")
             if time.monotonic() > self.deadline:
                 raise TimeoutError("数据分块读取超时，已保留缓存，可重试或更换镜像。")
             self.progress(f"读取分块 {size/1e6:.2f} MB")
@@ -87,7 +109,6 @@ class RangeFile(io.RawIOBase):
                 self.transferred += size
             finally:
                 response.close()
-        self.position += size
         return data
 
     def readinto(self, buffer):
@@ -98,7 +119,7 @@ class RangeFile(io.RawIOBase):
         super().close()
 
 
-def cached_extract(cache, kind, bbox, release=None):
+def cached_extract(cache, kind, bbox, release=None, required_columns=()):
     """Accept both v0.1 retained extracts and the generic v0.2 cache layout."""
     cache=Path(cache)
     candidates=list(cache.glob(f"overture-{kind}*.source.json"))+list(cache.glob(f"*/{kind}/*.source.json"))
@@ -108,27 +129,31 @@ def cached_extract(cache, kind, bbox, release=None):
         if (data_path.exists() and contains_bbox(meta.get("bbox",[]),bbox)
                 and (release is None or meta.get("release")==release)
                 and (not meta.get("sha256") or meta["sha256"]==hashlib.sha256(data_path.read_bytes()).hexdigest())):
+            if required_columns:
+                _,_,pq,_=arrow_modules()
+                if not set(required_columns).issubset(pq.read_schema(data_path).names):
+                    continue
             return data_path,meta
     return None
 
 
-def extract(cache, kind, bbox, *, release=None, offline=False, progress=None):
+def extract(cache, kind, bbox, *, release=None, offline=False, progress=None, required_columns=()):
     if release is not None and not re.fullmatch(r"\d{4}-\d{2}-\d{2}\.\d+",release):
         raise ValueError("release 格式需要 YYYY-MM-DD.n。")
     pa,pc,pq,requests=arrow_modules()
     cache=Path(cache);cache.mkdir(parents=True,exist_ok=True)
     progress=progress or (lambda message: None)
-    retained=cached_extract(cache,kind,bbox,release)
+    retained=cached_extract(cache,kind,bbox,release,required_columns)
     if retained and (offline or release is not None):
         path,meta=retained
         return pq.read_table(path,filters=bbox_filter(pc,bbox)),meta
     if offline:
-        raise ValueError(f"离线缓存中没有覆盖本次取数范围的 {kind}，请联网获取或提供资料。")
+        raise ValueError(f"离线缓存中没有覆盖本次范围且具有所需字段的 {kind}，请联网获取或提供资料。")
     if release is None:
         response=requests.get(CATALOG_URL,timeout=(10,25));response.raise_for_status()
         catalog=response.json();release=catalog["latest"]
         write_json(cache/"overture-catalog.json",catalog)
-    retained=cached_extract(cache,kind,bbox,release)
+    retained=cached_extract(cache,kind,bbox,release,required_columns)
     if retained:
         path,meta=retained
         return pq.read_table(path,filters=bbox_filter(pc,bbox)),meta
@@ -148,7 +173,11 @@ def extract(cache, kind, bbox, *, release=None, offline=False, progress=None):
                 progress(f"{kind}：分片 {n+1}/{len(assets)}，{provider} 镜像")
                 with RangeFile(asset[provider],cache/"ranges",progress) as handle:
                     schema=pq.ParquetFile(handle).schema_arrow
-                    columns=[key for key in ("id","geometry","bbox","names","sources","class","subtype","has_parts","height","num_floors","level") if key in schema.names]
+                    if not set(required_columns).issubset(schema.names):
+                        raise ValueError(f"来源缺少必要字段：{sorted(set(required_columns)-set(schema.names))}")
+                    columns=[key for key in ("id","geometry","bbox","names","sources","class","subtype","has_parts","height","num_floors","level",
+                              "connectors","access_restrictions","prohibited_transitions","road_flags","level_rules",
+                              "division_id","country","region","admin_level","is_land","is_territorial") if key in schema.names]
                     handle.seek(0)
                     table=pq.read_table(handle,columns=columns,filters=bbox_filter(pc,bbox),use_threads=False,pre_buffer=False)
                 tables.append(table);sources.append(asset[provider]["href"])
@@ -158,7 +187,7 @@ def extract(cache, kind, bbox, *, release=None, offline=False, progress=None):
         else:
             raise ValueError(f"{kind} 读取失败："+"; ".join(errors))
     table=pa.concat_tables(tables)
-    query_hash=hashlib.sha256(json.dumps(bbox).encode()).hexdigest()[:16]
+    query_hash=hashlib.sha256(json.dumps({"bbox":bbox,"columns":sorted(required_columns)} if required_columns else bbox).encode()).hexdigest()[:16]
     folder=cache/release/kind;folder.mkdir(parents=True,exist_ok=True)
     path=folder/f"{query_hash}.parquet"
     temp=path.with_suffix(".tmp");pq.write_table(table,temp);temp.replace(path)

@@ -29,6 +29,12 @@ def prepare(task_path):
         if not confirmed:
             blockers.append("需求待确认或确认后发生变更：先查看任务卡，再执行 confirm。")
         else:
+            from .cartography import CARTOGRAPHIC_DIAGRAMS, validate_parameters as validate_cartographic
+            if did in CARTOGRAPHIC_DIAGRAMS:
+                try:
+                    validate_cartographic(did,params)
+                except ValueError as exc:
+                    blockers.append(str(exc))
             provenance = {k: {**v, "confirmed": True} for k, v in provenance.items()}
         formats = item.get("output_formats", task.get("output_formats", ["svg"]))
         if not isinstance(formats, list) or not formats or any(f not in FORMATS for f in formats):
@@ -91,7 +97,7 @@ def prepare(task_path):
                 warnings.append(f"{rid} 仅代表数据源已收录对象，现实完整性未核实；地图空白不等于现实空地。")
         if not implemented:
             warnings.append("依赖列表仅为目录基础依赖；模式相关的完整检查尚未实现。")
-        elif did in {"density","orientrose","typology"}:
+        elif did in {"density","orientrose","typology","context","location","orient","pedestrian","combined","fabricplus","connectionfield"}:
             warnings.append("当前实现范围："+IMPLEMENTATION_SCOPE[did])
         blockers.extend(data_errors)
         instances.append({"instance_id": iid, "diagram_id": did, "name": DIAGRAMS[did]["name_zh"],

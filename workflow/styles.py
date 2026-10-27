@@ -8,7 +8,9 @@ SEMANTIC_COLORS = {"居住用地":"#edce75","商业服务":"#e78a94","公共服�
     "高速快速路":"#2e514f","主干道":"#456963","次干道":"#708b7c","支路街道":"#9aaa99","内部服务路":"#b4bdad","步行与非机动车":"#d0ccbb"}
 ROAD_WIDTHS={"高速快速路":1.8,"主干道":1.35,"次干道":.85,"支路街道":.55,"内部服务路":.35,"步行与非机动车":.25}
 TITLES={"fabric":"建筑城市肌理","roads":"路网与街道","landuse":"用地功能分布","gw":"绿地与水体",
-        "density":"建筑轮廓覆盖率","orientrose":"街道方向玫瑰图","typology":"建筑轮廓类型学图录"}
+        "density":"建筑轮廓覆盖率","orientrose":"街道方向玫瑰图","typology":"建筑轮廓类型学图录",
+        "context":"城市区位","location":"多级行政区位","orient":"真北与方位参考","pedestrian":"步行通行属性底图",
+        "combined":"综合图层叠加","fabricplus":"城市肌理概化","connectionfield":"路口几何关联场"}
 
 
 def effective_style(task,item):
@@ -26,6 +28,11 @@ def validate_style(style):
 
 
 def diagram_colors(result,style):
+    if result.get('cartographic_kind'):
+        colors=dict(result['legend_colors'])
+        if style.get('palette')=='monochrome':
+            shades=PALETTES['monochrome'];colors={k:shades[n%len(shades)] for n,k in enumerate(colors)}
+        return colors
     if result.get("display_kind")=="density_grid":
         shades = (["#f1f0e7","#d4d8d9","#abb4b9","#828e97","#566571","#293d4a"] if style.get("palette")=="monochrome"
                   else ["#f1f0e7","#dce5ce","#b9cfaa","#8daf88","#5f8868","#355c49"])

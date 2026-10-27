@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
-from .analysis import analyze, algorithm_version
+from .analysis import analyze_resources, algorithm_version
 from .catalog import read_json
 from .compiler import prepare, task_card_markdown
 from .spatial import digest, file_hash
@@ -71,11 +71,13 @@ def execute(task_path, output_root):
             item_dir = run_dir / item["instance_id"]
             item_dir.mkdir()
             params = {k: v["value"] for k, v in item["parameters"].items()}
-            dataset = resources[item["required_data"][0]]
+            inputs = {rid: resources[rid] for rid in item["required_data"]}
             key = digest({"algorithm": algorithm_version(item["diagram_id"]), "diagram": item["diagram_id"],
                           "parameters": {k:v for k,v in params.items() if k!="show_names"},
                           "project": spatial_signature(task["project"]),
-                          "data_hash": dataset["sha256"], "data_metadata": dataset["metadata"]})
+                          "data_hash": {rid:data["sha256"] for rid,data in inputs.items()},
+                          "data_metadata": {rid:data["metadata"] for rid,data in inputs.items()},
+                          "location": {k:task["project"].get("location",{}).get(k) for k in ("lon","lat")}})
             cache_path = cache_dir / f"{key}.json"
             try:
                 cached = read_json(cache_path) if cache_path.exists() else None
@@ -85,7 +87,7 @@ def execute(task_path, output_root):
                 result = cached["result"]
                 item["analysis_cache_hit"] = True
             else:
-                result = analyze(item["diagram_id"], params, dataset, ctx)
+                result = analyze_resources(item["diagram_id"], params, inputs, ctx, task["project"])
                 write_json(cache_path, {"result": result, "result_sha256": digest(result)})
                 item["analysis_cache_hit"] = False
             item["analysis_key"] = key

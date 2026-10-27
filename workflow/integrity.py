@@ -54,12 +54,16 @@ def inspect_run(run):
             if result["analysis_area_m2"]<=0: problems.append("统计范围面积无效。")
             if result.get("coverage_percent") is not None and not 0 <= result["coverage_percent"] <= 100.000001:
                 problems.append("面积覆盖超过100%或低于0%。")
-            total=result["total_length_m"] if result.get("total_length_m") is not None else result["total_area_m2"]
+            total=(result["statistic_total"] if "statistic_total" in result else
+                   result["total_length_m"] if result.get("total_length_m") is not None else result["total_area_m2"])
             if not math.isclose(sum(row["value"] for row in result["table"]),total,rel_tol=1e-8,abs_tol=1e-6):
                 problems.append("统计表合计与图上总指标不一致。")
             for rid in item["required_data"]:
-                if rid in manifest.get("input_resources",{}) and result["data_sha256"]!=manifest["input_resources"][rid]["sha256"]:
+                actual=result.get("data_hashes",{}).get(rid) if "data_hashes" in result else result["data_sha256"]
+                if rid in manifest.get("input_resources",{}) and actual!=manifest["input_resources"][rid]["sha256"]:
                     problems.append("分析数据版本与冻结输入不一致。")
+            if "data_hashes" in result and set(result["data_hashes"])!=set(item["required_data"]):
+                problems.append("分析输入清单与实际资源依赖不一致。")
             checked.append(item["instance_id"])
         except (ValueError,OSError,KeyError,TypeError) as exc: problems.append(f"分析记录无法核对：{exc}")
     return {"checked_at":now(),"passed":not problems,"checked_instances":checked,"problems":problems,
